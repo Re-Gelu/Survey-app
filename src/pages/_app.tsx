@@ -4,6 +4,7 @@ import { getCookie, setCookie } from 'cookies-next';
 import Head from 'next/head';
 import { MantineProvider, ColorScheme, ColorSchemeProvider, DefaultMantineColor } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
+import '@/styles/styles.css';
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   const { Component, pageProps } = props;
@@ -29,7 +30,7 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
         <MantineProvider theme={{ 
           colorScheme: colorScheme, 
           primaryColor: defaultColor,
-          defaultGradient: { deg: 45, from: defaultColor, to: "white" },
+          defaultGradient: { deg: 45, from: defaultColor, to: "gray" },
         }} withGlobalStyles withNormalizeCSS>
           <Component {...pageProps} />
           <Notifications />

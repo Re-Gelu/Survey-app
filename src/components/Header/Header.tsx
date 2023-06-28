@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Title, Text, Header, Container, Group, Burger } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { ColorSchemeToggle } from '@/components/ColorSchemeToggle/ColorSchemeToggle';
+import Link from 'next/link';
 import useStyles from './Header.styles';
 
 interface HeaderSimpleProps {
@@ -30,12 +31,14 @@ export const HeaderSimple = ({ links }: HeaderSimpleProps) => {
   return (
     <Header height={60} mb="md">
       <Container className={classes.header}>
-        <Title className={classes.title}>
-          Survey  
-          <Text inherit variant="gradient" component="span" mx="sm">
-             App
-          </Text>
-        </Title>
+        <Link href="/">
+          <Title className={classes.title}>
+            Survey  
+            <Text inherit variant="gradient" component="span" mx="sm">
+              App
+            </Text>
+          </Title>
+        </Link>
         <Group spacing={5} className={classes.links}>
           {items}
           <ColorSchemeToggle></ColorSchemeToggle>

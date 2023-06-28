@@ -5,6 +5,7 @@ import { PollingStepper } from '@/components/PollingStepper/PollingStepper';
 import { useState } from 'react';
 import {
   Grid,
+  Text,
   Center,
   Loader,
   Space,
@@ -32,7 +33,11 @@ export default function HomePage() {
           <Grid.Col span={6} >
             <Center mx="auto">
               <Container>
-                TEXT
+                <Text fz="xl" fw={300}>
+                  Welcome to our voting app! 
+                  We have developed this application using advanced technology to provide you with 
+                  a convenient and secure way to conduct voting.
+                </Text>
               </Container>
             </Center>
           </Grid.Col>
@@ -62,7 +67,7 @@ export default function HomePage() {
                 </CustomAlert>
               </Container>
           }
-          
+
         </Container>
     </Container>
   );

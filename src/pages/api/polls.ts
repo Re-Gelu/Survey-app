@@ -2,9 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import faunaClient, { q, defaultPageOffset, pollsCollectionName } from '@/faunadbConfig';
 
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-
 
   const {
     body,
@@ -20,15 +18,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const requestOffset: number = offset ? parseInt(offset as string) : 0
 
       // DB Get request
-      var dbQueryResponse: any = await faunaClient.query(
+      var dbQueryResponse: FaunaQueryResponse = await faunaClient.query(
         q.Map(
           q.Paginate(q.Documents(q.Collection('Polls'))),
-          q.Lambda((poll) => q.Get(poll))
+          q.Lambda('ref', q.Get(q.Var('ref')))
         )
       );
       
-      // Pagination by offset
-      const polls: Partial<Poll>[] = dbQueryResponse.data.map((item: {data: Poll}) => item.data);
+      // Mapping DB response to add id
+      const polls: Partial<Poll>[] = dbQueryResponse.data.map((poll: FaunaResponse) => ({
+        id: poll.ref.id,
+        ...poll.data,
+      }));
+      
+      // Response with pagination slice
       res.status(200).json({
         offset: requestOffset,
         page_size: requestPageSize,
@@ -56,7 +59,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
 
       // DB Create request
-      var dbQueryResponse: any = await faunaClient.query(
+      var dbQueryResponse: FaunaQueryResponse = await faunaClient.query(
         q.Create(q.Collection(pollsCollectionName), {
           data: {
             question,

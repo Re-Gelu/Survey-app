@@ -28,10 +28,10 @@ export const HeaderSimple = ({ links }: HeaderSimpleProps) => {
   ));
 
   return (
-    <Header height={60} mb={120}>
+    <Header height={60} mb="md">
       <Container className={classes.header}>
         <Title className={classes.title}>
-          Polling 
+          Survey  
           <Text inherit variant="gradient" component="span" mx="sm">
              App
           </Text>

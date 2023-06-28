@@ -1,9 +1,12 @@
 import { HeaderSimple } from '@/components/Header/Header';
 import { PollsTable } from '@/components/PollsTable/PollsTable';
+import { CustomAlert } from '@/components/Alert/Alert';
 import { useState } from 'react';
 import {
   Center,
   Skeleton,
+  Loader,
+  Text,
   Container,
 } from '@mantine/core';
 import useSWR from 'swr';
@@ -24,13 +27,16 @@ export default function HomePage() {
       <Center mx="auto">
           {
             (!error) ?
-              <Skeleton visible={isLoading}>
-                {(data && !isLoading) && <PollsTable data={data.data}></PollsTable>}
-              </Skeleton>
+              (isLoading) ? 
+                <Loader size="xl" variant="dots"/>
+              :
+                <PollsTable data={data.data}></PollsTable>
             : 
-              <div>Ошибка загрузки данных</div>
+              <CustomAlert>
+                Error while loading the data!
+              </CustomAlert>
           }
         </Center>
     </Container>
   );
-}
+};

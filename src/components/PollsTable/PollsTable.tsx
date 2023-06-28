@@ -16,17 +16,15 @@ export const PollsTable = ({ data }: { data: Poll[] }) => {
         </Group>
       </td>
 
-      <td>
-        {/* <Select data={rolesData} defaultValue={item.role} variant="unstyled" /> */}
-      </td>
+      {/* <td>
+        <Select data={rolesData} defaultValue={item.role} variant="unstyled" />
+      </td> */}
       <td>{item.created_at && new Date(item.created_at).toLocaleDateString()}</td>
       <td>
         {Math.random() > 0.5 ? (
           <Badge fullWidth>Active</Badge>
         ) : (
-          <Badge color="gray" fullWidth>
-            Disabled
-          </Badge>
+          <Badge color="gray" fullWidth>Disabled</Badge>
         )}
       </td>
     </tr>
@@ -38,7 +36,6 @@ export const PollsTable = ({ data }: { data: Poll[] }) => {
         <thead>
           <tr>
             <th>Question</th>
-            <th>Popular answer</th>
             <th>Published</th>
             <th>Status</th>
           </tr>

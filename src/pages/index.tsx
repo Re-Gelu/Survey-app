@@ -16,7 +16,7 @@ import fetcher from '@/swr';
 
 export default function HomePage() {
   const [opened, setOpened] = useState(false);
-  const { data, error, isLoading } = useSWR('/api/polls?offset=5', fetcher);
+  const { data, error, isLoading } = useSWR('/api/polls?offset=0&page_size=100', fetcher);
   
   return (
     <Container className="box">
@@ -27,14 +27,26 @@ export default function HomePage() {
         }
       ]} />
       <Container>
+
         <Grid my="xl">
-          <Grid.Col span={6} >TEST</Grid.Col>
+          <Grid.Col span={6} >
+            <Center mx="auto">
+              <Container>
+                TEXT
+              </Container>
+            </Center>
+          </Grid.Col>
             <Grid.Col span={6} >
-              <Title order={2}>First time there?</Title>
-              <Space h="xl" />
-              <PollingStepper></PollingStepper>
+              <Center mx="auto">
+                <Container>
+                  <Title order={2}>First time there?</Title>
+                  <Space h="xl" />
+                  <PollingStepper></PollingStepper>
+                </Container>
+              </Center>
             </Grid.Col>
           </Grid>
+
           {
             (!error) ?
               (isLoading) ? 
@@ -50,6 +62,7 @@ export default function HomePage() {
                 </CustomAlert>
               </Container>
           }
+          
         </Container>
     </Container>
   );

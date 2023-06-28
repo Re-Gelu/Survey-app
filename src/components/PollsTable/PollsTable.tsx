@@ -1,4 +1,4 @@
-import { Badge, Table, Group, Text, ScrollArea } from '@mantine/core';
+import { Avatar, Table, Group, Text, ActionIcon, Stack, ScrollArea, Badge } from '@mantine/core';
 
 export const PollsTable = ({ data }: { data: Poll[] }) => {
   const rows = data && data.map((item) => (
@@ -31,8 +31,8 @@ export const PollsTable = ({ data }: { data: Poll[] }) => {
   ));
 
   return (
-    <ScrollArea>
-      <Table miw={800} verticalSpacing="sm">
+    <ScrollArea h={600} type="always" offsetScrollbars> 
+      <Table miw={200} verticalSpacing="sm">
         <thead>
           <tr>
             <th>Question</th>

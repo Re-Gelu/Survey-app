@@ -1,12 +1,14 @@
 import { HeaderSimple } from '@/components/Header/Header';
 import { PollsTable } from '@/components/PollsTable/PollsTable';
 import { CustomAlert } from '@/components/Alert/Alert';
+import { PollingStepper } from '@/components/PollingStepper/PollingStepper';
 import { useState } from 'react';
 import {
+  Grid,
   Center,
-  Skeleton,
   Loader,
-  Text,
+  Space,
+  Title,
   Container,
 } from '@mantine/core';
 import useSWR from 'swr';
@@ -24,19 +26,31 @@ export default function HomePage() {
           "label": "Your Polls"
         }
       ]} />
-      <Center mx="auto">
+      <Container>
+        <Grid my="xl">
+          <Grid.Col span={6} >TEST</Grid.Col>
+            <Grid.Col span={6} >
+              <Title order={2}>First time there?</Title>
+              <Space h="xl" />
+              <PollingStepper></PollingStepper>
+            </Grid.Col>
+          </Grid>
           {
             (!error) ?
               (isLoading) ? 
-                <Loader size="xl" variant="dots"/>
+                <Center mx="xl" my="xl">
+                  <Loader size="xl" variant="dots"/>
+                </Center>
               :
                 <PollsTable data={data.data}></PollsTable>
             : 
-              <CustomAlert>
-                Error while loading the data!
-              </CustomAlert>
+              <Container size="sm" my="xl">
+                <CustomAlert>
+                  Error while loading the data!
+                </CustomAlert>
+              </Container>
           }
-        </Center>
+        </Container>
     </Container>
   );
 };

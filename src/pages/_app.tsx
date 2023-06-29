@@ -2,8 +2,9 @@ import { useState } from 'react';
 import NextApp, { AppProps, AppContext } from 'next/app';
 import { getCookie, setCookie } from 'cookies-next';
 import Head from 'next/head';
-import { MantineProvider, ColorScheme, ColorSchemeProvider, DefaultMantineColor } from '@mantine/core';
+import { MantineProvider, ColorScheme, ColorSchemeProvider, DefaultMantineColor, Container } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
+import { HeaderSimple } from '@/components/Header/Header';
 import '@/styles/styles.css';
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
@@ -23,16 +24,23 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
         <title>Polls App</title>
         <meta name="description" content="App for polls" />
         <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
-        <link rel="shortcut icon" href="/favicon.svg" />
+        <link rel="shortcut icon" href="/favicon.ico" />
       </Head>
 
       <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
         <MantineProvider theme={{ 
           colorScheme: colorScheme, 
           primaryColor: defaultColor,
-          defaultGradient: { deg: 45, from: defaultColor, to: "gray" },
+          defaultGradient: { deg: 45, from: defaultColor, to: `${defaultColor}.4` },
         }} withGlobalStyles withNormalizeCSS>
-          <Component {...pageProps} />
+
+          <Container className="box">
+            <HeaderSimple/>
+            <Container>
+              <Component {...pageProps} />
+            </Container>
+          </Container>
+          
           <Notifications />
         </MantineProvider>
       </ColorSchemeProvider>

@@ -11,7 +11,7 @@ type Poll = {
   question: string;
   choices: Choice[];
   is_multiple_answer_options: boolean;
-  created_at: Date;
+  created_at?: Date;
   expires_at?: string;
 };
 

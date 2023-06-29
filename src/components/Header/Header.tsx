@@ -22,13 +22,15 @@ export const HeaderSimple = () => {
           </Title>
         </Link>
         <Group spacing={5}>
-          <ActionIcon
-            size="lg"
-            variant="outline"
-            title="Your polls"
-          >
-            <IconUser size={18} />
-          </ActionIcon>
+          <Link href="/dashboard">
+            <ActionIcon
+              size="lg"
+              variant="outline"
+              title="Your polls"
+            >
+              <IconUser size={18} />
+            </ActionIcon>
+          </Link>
           <ColorSchemeToggle></ColorSchemeToggle>
         </Group>
 

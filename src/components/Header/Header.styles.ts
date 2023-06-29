@@ -19,8 +19,8 @@ export default createStyles((theme) => ({
     },
   },
 
-  links: {
-    [theme.fn.smallerThan('xs')]: {
+  /* links: {
+    [theme.fn.smallerThan('sm')]: {
       display: 'none',
     },
   },
@@ -29,7 +29,7 @@ export default createStyles((theme) => ({
     [theme.fn.largerThan('xs')]: {
       display: 'none',
     },
-  },
+  }, */
 
   link: {
     display: 'block',

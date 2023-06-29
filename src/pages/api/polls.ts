@@ -42,7 +42,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     case 'POST':
 
       // Getting the data from the request
-      const {question, choices}: Partial<Poll> = body;
+      const {question, choices, is_multiple_answer_options}: Partial<Poll> = body;
 
       // Check if the data is valid
       if (!question || !choices) { 
@@ -53,10 +53,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(400).json({ "question": "Question length must be 1 <= N <= 250" }); 
         break;
       }
-      if (!(choices.length >= 1 && choices.length <= 10)) {
-        res.status(400).json({ "choices": "Choices length must be 1 <= N <= 10" }); 
+      if (!(choices.length > 1 && choices.length <= 10)) {
+        res.status(400).json({ "choices": "Choices length must be 1 < N <= 10" }); 
         break;
       }
+      const is_multiple_answer_options_final: boolean = (typeof(is_multiple_answer_options) === "undefined") ? false : is_multiple_answer_options;
 
       // DB Create request
       var dbQueryResponse: FaunaQueryResponse = await faunaClient.query(
@@ -64,6 +65,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           data: {
             question,
             choices,
+            is_multiple_answer_options_final,
             created_at: new Date().toJSON()
           },
         })

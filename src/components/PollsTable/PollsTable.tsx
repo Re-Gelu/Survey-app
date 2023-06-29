@@ -12,7 +12,7 @@ export const PollsTable = ({ data }: { data: Poll[] }) => {
           <Link href={`/${item.id}`}>
             <Group>
               <ActionIcon variant="transparent" className={classes.adapt}><IconArrowBadgeRight size={28} /></ActionIcon>
-              <Text fz="xl" fw={400} variant="gradient">
+              <Text fz="xl" fw={400} variant="gradient" className={classes.adaptFont}>
                 {item.question && item.question}
               </Text>
             </Group>

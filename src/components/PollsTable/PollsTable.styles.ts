@@ -6,4 +6,10 @@ export default createStyles((theme) => ({
             display: 'none',
         },
     },
+    
+    adaptFont: {
+        [theme.fn.smallerThan('xs')]: {
+            fontSize: 18,
+        },
+    }
 }));

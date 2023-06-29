@@ -1,23 +1,23 @@
 // Тип для варианта ответа
 type Choice = {
-  id: string;
+  id?: string;
   text: string;
   votes: number;
 };
 
 // Тип для опроса
 type Poll = {
-  id: string;
+  id?: string;
   question: string;
   choices: Choice[];
   is_multiple_answer_options: boolean;
   created_at: Date;
   expires_at?: string;
-}
+};
 
 // Тип для голоса
 type Response = {
-  id: string;
+  id?: string;
   poll_id: string;
   choice_id: string;
   voter_ip: string;
@@ -27,7 +27,7 @@ type Response = {
 // Type of Fauna DB response
 type FaunaResponse = {
   ref: { id: string };
-  data: object;
+  data: Poll[] | Poll;
   ts: number;
 };
 

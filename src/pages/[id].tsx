@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import { Grid, Text, Center, Loader, Space, Title, Container, Radio, Button } from '@mantine/core';
+import { Grid, Text, Center, Loader, Space, Title, Container, Radio, Button, Group } from '@mantine/core';
 import { CustomAlert } from '@/components/Alert/Alert';
 import { useForm, isNotEmpty } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -84,7 +84,12 @@ const PollPage = () => {
                 <Title order={3} fw={400}>Voting options:</Title>
                 {rows}
                 <Space h="xl"/>
-                <Button type="submit">Confrim</Button>
+                <Group>
+                  <Button type="submit" variant="outline" radius="xl">Confrim</Button>
+                  <Text c="dimmed">
+                    {data.choices.reduce((n: number, {votes}: {votes: number}) => n + votes, 0)} votes
+                  </Text>
+                </Group>
               </form>
             </>
         : 

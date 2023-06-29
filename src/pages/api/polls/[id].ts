@@ -1,6 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
-import faunaClient, { q, defaultPageOffset, pollsCollectionName } from '@/faunadbConfig';
+import faunaClient, { q, pollsCollectionName } from '@/faunadbConfig';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 
@@ -14,15 +13,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     case 'GET':
       try {
         // DB Get request
-        var dbQueryResponse: any = await faunaClient.query(
+        var dbQueryResponse: FaunaResponse = await faunaClient.query(
           q.Get(q.Ref(q.Collection(pollsCollectionName), id))
         );
 
-        const poll: Poll = dbQueryResponse.data;
+        const poll = {
+        id: dbQueryResponse.ref.id,
+        ...dbQueryResponse.data,
+      };
         res.status(200).json(poll);
       } catch {
         // Not found response
-        res.status(404).json({ error: 'Not found!' });
+        res.status(404).json({ error: 'Poll not found!' });
       };
       break;
 
@@ -34,23 +36,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     case 'DELETE':
       // The following query looks a bit complicated, but it:
-      // - avoids trying to delete a Todo document unless it exists
-      // This step prevents problems if another instance of the todo app (or
+      // - avoids trying to delete a Polls document unless it exists
+      // This step prevents problems if another instance of the Polls app (or
       // the Fauna Dashboard) has already deleted the Todo document.
       await faunaClient.query(
         q.Let(
           {
-            todoRef: q.Ref(q.Collection('Todos'), id),
-            todoExists: q.Exists(q.Var('todoRef')),
+            PollsRef: q.Ref(q.Collection(pollsCollectionName), id),
+            PollsExists: q.Exists(q.Var(`${pollsCollectionName}Ref`)),
           },
           q.If(
-            q.Var('todoExists'),
-            q.Delete(q.Ref(q.Collection('Todos'), id)),
+            q.Var(`${pollsCollectionName}Exists`),
+            q.Delete(q.Ref(q.Collection(pollsCollectionName), id)),
             null
           )
         )
       )
       .catch((err) => console.log(err))
+      res.status(200).json({ message: 'Опрос успешно удален' });
       break;
 
     default:

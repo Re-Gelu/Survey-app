@@ -18,9 +18,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         );
 
         const poll = {
-        id: dbQueryResponse.ref.id,
-        ...dbQueryResponse.data,
-      };
+          id: dbQueryResponse.ref.id,
+          ...dbQueryResponse.data,
+        };
         res.status(200).json(poll);
       } catch {
         // Not found response
@@ -28,10 +28,53 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       };
       break;
 
-    case 'POST':
-      break;
-
     case 'PUT':
+      try {
+        // Getting the data from the request
+        const {question, choices, is_multiple_answer_options}: Partial<Poll> = body;
+
+        // Check if the data is valid
+        if (!question && !choices) { 
+          res.status(400).json({ "message": "Missing required data" }); 
+          break;
+        }
+        if (question && !(question.length >= 1 && question.length <= 250)) {
+          res.status(400).json({ "question": "Question length must be 1 <= N <= 250" }); 
+          break;
+        }
+        if (choices && !(choices.length > 1 && choices.length <= 10)) {
+          res.status(400).json({ "choices": "Choices length must be 1 < N <= 10" }); 
+          break;
+        }
+        const is_multiple_answer_options_final: boolean = (typeof(is_multiple_answer_options) === "undefined") ? false : is_multiple_answer_options;
+        
+        // Getting existing poll
+        var existingPoll: FaunaResponse = await faunaClient.query(
+          q.Get(q.Ref(q.Collection(pollsCollectionName), id))
+        );
+
+        // DB Update request
+         var dbQueryResponse: FaunaResponse = await faunaClient.query(
+          q.Update(q.Ref(q.Collection(pollsCollectionName), id), {
+            data: {
+              question,
+              choices,
+              is_multiple_answer_options,
+              ...existingPoll.data,
+            },
+          })
+        );
+
+        const poll = {
+          id: dbQueryResponse.ref.id,
+          ...dbQueryResponse.data,
+        };
+
+        res.status(200).json(poll);
+      } catch {
+        // Not found response
+        res.status(404).json({ error: 'Poll not found!' });
+      };
       break;
 
     case 'DELETE':

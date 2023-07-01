@@ -30,7 +30,7 @@ export const PollsTable = ({ data }: { data: Poll[] }) => {
   ));
 
   return (
-    <ScrollArea h={600} type="always" offsetScrollbars> 
+    <ScrollArea mih={200} type="always" offsetScrollbars> 
       <Table miw={200} verticalSpacing="sm" highlightOnHover>
         <thead>
           <tr>

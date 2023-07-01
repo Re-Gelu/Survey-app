@@ -1,12 +1,28 @@
-# Mantine Next Template
+# Survey app
 
-Get started with Mantine + Next with just a few button clicks.
-Click `Use this template` button at the header of repository or [follow this link](https://github.com/mantinedev/mantine-next-template/generate) and
-create new repository with `@mantine` packages. Note that you have to be logged in to GitHub to generate template.
+Tools: Next.js, TypeScript, FaunaDB, Mantine UI
+
+Description:
+You should to create a quick polling web application where users can create polls, share them, and gather responses. All the polls and their responses should be stored in FaunaDB.
+
+Basic Features:
+- Poll Creation: Users can create a poll with a question and multiple choices;
+- Sharing: After creating a poll, a unique URL is generated that can be shared with others to gather responses;
+- Vote: Anyone with the poll's URL can vote on it. Once they've voted, they can see the current poll results.
+
+Advanced features:
+- IP tracking: only one vote can be done from one IP address;
+- Polls expiry: on creating a poll, you can set an expiration time (e.g. 12 hours), which would then displayed on poll page. After expiration time, poll should only display final results.
+
+Expectations:
+- Use Next.js with TypeScript for both the front-end and back-end.
+- Do not use new app router and server components (it works poorly with Mantine).
+- Use Next.js API routes for handling poll creation, voting, and results retrieval.
+- Do not use FaunaDB's graphql endpoint - only use FQL.
+- Code should be clean and modular.
+- UI can be simple, but the application should be user-friendly.
 
 ## Features
-
-This template comes with several essential features:
 
 - Server side rendering setup for Mantine
 - Color scheme is stored in cookie to avoid color scheme mismatch after hydration

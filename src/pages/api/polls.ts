@@ -1,8 +1,10 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
 import faunaClient, { q, defaultPageOffset, pollsCollectionName } from '@/faunadbConfig';
+import { getCookie } from 'cookies-next';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const userIp = getCookie("user-ip");
 
   const {
     body,
@@ -18,7 +20,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const requestOffset: number = offset ? parseInt(offset as string) : 0
 
       // DB Get request
-      var dbQueryResponse: FaunaQueryResponse = await faunaClient.query(
+      var dbQueryResponse: FaunaPollsQueryResponse = await faunaClient.query(
         q.Map(
           q.Paginate(q.Documents(q.Collection('Polls'))),
           q.Lambda('ref', q.Get(q.Var('ref')))
@@ -26,7 +28,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       );
       
       // Mapping DB response to add id
-      const polls: Partial<Poll>[] = dbQueryResponse.data.map((poll: FaunaResponse) => ({
+      const polls: Partial<Poll>[] = dbQueryResponse.data.map((poll: FaunaPollResponse) => ({
         id: poll.ref.id,
         ...poll.data,
       }));
@@ -46,9 +48,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
       // Check if the data is valid
       if (!question || !choices) { 
-        res.status(400).json({ "message": "Missing required data" }); 
+        res.status(400).json({ "error": "Missing required data" }); 
         break;
-      }
+      };
       if (!(question.length >= 1 && question.length <= 250)) {
         res.status(400).json({ "question": "Question length must be 1 <= N <= 250" }); 
         break;
@@ -59,15 +61,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       const is_multiple_answer_options_final: boolean = (typeof(is_multiple_answer_options) === "undefined") ? false : is_multiple_answer_options;
 
+      const data: Poll = {
+        question: question,
+        choices: choices,
+        is_multiple_answer_options: is_multiple_answer_options_final,
+        creator_ip: userIp,
+        created_at: new Date().toJSON()
+      };
+
       // DB Create request
-      var dbQueryResponse: FaunaQueryResponse = await faunaClient.query(
+      var dbQueryResponse: FaunaPollsQueryResponse = await faunaClient.query(
         q.Create(q.Collection(pollsCollectionName), {
-          data: {
-            question,
-            choices,
-            is_multiple_answer_options_final,
-            created_at: new Date().toJSON()
-          },
+          data: data,
         })
       );
 

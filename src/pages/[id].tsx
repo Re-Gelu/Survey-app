@@ -1,15 +1,24 @@
 import { useRouter } from 'next/router';
-import { Grid, Text, Center, Loader, Space, Title, Container, Radio, Button, Group } from '@mantine/core';
+import { Grid, Text, Center, Loader, Space, Title, Container, Radio, Button, Group, Box } from '@mantine/core';
 import { CustomAlert } from '@/components/Alert/Alert';
 import { useForm, isNotEmpty } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
+import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import fetcher from '@/swr';
+import axios from 'axios';
 
 const PollPage = () => {
   const router = useRouter();
   const { data, error, isLoading } = useSWR(`/api/polls/${router.query.id}`, fetcher);
-  
+  const [ votesAmount, setVotesAmount ] = useState<number>(0);
+
+ useEffect(() => {
+    if (!error && !isLoading && data) {
+      setVotesAmount(data.choices.reduce((sum: number, choice: Choice) => sum + choice.votes.length, 0));
+    };
+  }, [data, error, isLoading]);
+    
   const form = useForm({
     initialValues: {
       choice: '',
@@ -26,8 +35,16 @@ const PollPage = () => {
     };
   };
 
-  const handleSubmit = (values: typeof form.values) => {
-    console.log(values);
+  const handleSubmit = async (values: typeof form.values, event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    axios.post(`/api/polls/${router.query.id}/vote`, {choice_text: values.choice})
+    .then(() => {
+      setVotesAmount((prev) => prev + 1);
+      notifications.show({ message: 'Successfully voted', color: 'green' });
+    })
+    .catch((error) => {
+      notifications.show({ message: error.response.data.error, color: 'red' });
+    })
   };
   
   const rows = ((!error && !isLoading && data) ? (data.is_multiple_answer_options) ?
@@ -80,17 +97,17 @@ const PollPage = () => {
                   </Text>
                 </Grid.Col>
               </Grid>
-              <form onSubmit={form.onSubmit(handleSubmit, handleError)}>
+              <Box component="form" onSubmit={form.onSubmit(handleSubmit, handleError)}>
                 <Title order={3} fw={400}>Voting options:</Title>
                 {rows}
                 <Space h="xl"/>
                 <Group>
                   <Button type="submit" variant="outline" radius="xl">Confrim</Button>
                   <Text c="dimmed">
-                    {data.choices.reduce((n: number, {votes}: {votes: number}) => n + votes, 0)} votes
+                    {votesAmount} votes
                   </Text>
                 </Group>
-              </form>
+              </Box>
             </>
         : 
           <Container size="sm" my="xl" px="xl" py="xl">

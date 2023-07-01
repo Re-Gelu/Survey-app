@@ -13,7 +13,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     case 'GET':
       try {
         // DB Get request
-        var dbQueryResponse: FaunaResponse = await faunaClient.query(
+        var dbQueryResponse: FaunaPollResponse = await faunaClient.query(
           q.Get(q.Ref(q.Collection(pollsCollectionName), id))
         );
 
@@ -49,17 +49,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const is_multiple_answer_options_final: boolean = (typeof(is_multiple_answer_options) === "undefined") ? false : is_multiple_answer_options;
         
         // Getting existing poll
-        var existingPoll: FaunaResponse = await faunaClient.query(
+        var existingPoll: FaunaPollResponse = await faunaClient.query(
           q.Get(q.Ref(q.Collection(pollsCollectionName), id))
         );
 
         // DB Update request
-         var dbQueryResponse: FaunaResponse = await faunaClient.query(
+        var dbQueryResponse: FaunaPollResponse = await faunaClient.query(
           q.Update(q.Ref(q.Collection(pollsCollectionName), id), {
             data: {
               question,
               choices,
-              is_multiple_answer_options,
+              is_multiple_answer_options: is_multiple_answer_options_final,
               ...existingPoll.data,
             },
           })

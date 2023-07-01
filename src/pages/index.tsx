@@ -2,7 +2,7 @@ import { PollsTable } from '@/components/PollsTable/PollsTable';
 import { CustomAlert } from '@/components/Alert/Alert';
 import { PollingStepper } from '@/components/PollingStepper/PollingStepper';
 import { useState } from 'react';
-import { Grid, Text, Center, Loader, Space, Title, Paper, Container, Blockquote, AspectRatio } from '@mantine/core';
+import { Grid, Text, Center, Loader, Space, Title, Paper, Container, Blockquote } from '@mantine/core';
 import useSWR from 'swr';
 import fetcher from '@/swr';
 

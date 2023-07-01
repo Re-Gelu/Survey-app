@@ -22,7 +22,7 @@ export const HeaderSimple = () => {
           </Title>
         </Link>
         <Group spacing={5}>
-          <Link href="/dashboard">
+          <Link href="/auth/signin">
             <ActionIcon
               size="lg"
               variant="outline"

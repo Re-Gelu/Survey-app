@@ -1,7 +1,7 @@
 import { ActionIcon, useMantineColorScheme } from '@mantine/core';
 import { IconSun, IconMoonStars } from '@tabler/icons';
 
-export function ColorSchemeToggle() {
+export const ColorSchemeToggle = () => {
   const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 
   return (
@@ -23,4 +23,4 @@ export function ColorSchemeToggle() {
       )}
     </ActionIcon>
   );
-}
+};

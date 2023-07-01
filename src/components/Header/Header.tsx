@@ -5,12 +5,12 @@ import { IconUser } from '@tabler/icons-react';
 import Link from 'next/link';
 import useStyles from './Header.styles';
 
-export const HeaderSimple = () => {
+export const CustomHeader = () => {
   const [opened, { toggle }] = useDisclosure(false);
   const { classes, cx } = useStyles();
 
   return (
-    <Header height={60} mb="md">
+    <Header height={70} mb="md">
       <Container className={classes.header}>
         <Link href="/">
           <Title className={classes.title}>

@@ -7,7 +7,7 @@ import { Grid, Text, Center, Loader, Space, Title, Container, Radio, Button,
 import { CustomAlert } from '@/components/Alert/Alert';
 import { useForm, isNotEmpty } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { IconShare, IconCheck } from '@tabler/icons';
+import { IconShare, IconCheck, IconExclamationMark, IconSkull, } from '@tabler/icons';
 import { getCookie, CookieValueTypes } from 'cookies-next';
 import requestIp from 'request-ip';
 import useSWR from 'swr';
@@ -65,7 +65,11 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
 
   const handleError = (errors: typeof form.errors) => {
     if (errors.choice) {
-      notifications.show({ message: 'Please enter the answer', color: 'red' });
+      notifications.show({ 
+        message: 'Please enter the answer', 
+        color: 'red',
+        icon: <IconExclamationMark />
+      });
     };
   };
 
@@ -77,7 +81,11 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
       setVotesAmount((prev) => prev + 1);
       setIsAlreadyVoted(true);
 
-      notifications.show({ message: 'Successfully voted', color: 'green' });
+      notifications.show({ 
+        message: 'Successfully voted', 
+        color: 'green',
+        icon: <IconCheck />
+      });
 
       // Animate votes progressbars
       if (isAlreadyVoted) {
@@ -87,7 +95,11 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
       };
     })
     .catch((error) => {
-      notifications.show({ message: error.response.data.error, color: 'red' });
+      notifications.show({ 
+        message: error.response.data.error, 
+        color: 'red',
+        icon: <IconSkull />
+      });
     });
   };
 
@@ -178,8 +190,8 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
                     </Text>
                     <CopyButton value={window.location.href}>
                       {({ copied, copy }) => (
-                        <ActionIcon color={copied ? 'teal' : ''} onClick={copy} >
-                          {copied ? <IconCheck/> : <IconShare/>}
+                        <ActionIcon color={copied ? 'teal' : undefined} onClick={copy} >
+                          {copied ? <IconCheck /> : <IconShare stroke={1} />}
                         </ActionIcon>
                       )}
                     </CopyButton>

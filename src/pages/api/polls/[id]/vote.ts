@@ -1,11 +1,13 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import faunaClient, { q, pollsCollectionName, pollsVotesByPollIpIndexName } from '@/faunadbConfig';
-import { getCookie, getCookies } from 'cookies-next';
+import { getCookie } from 'cookies-next';
+import requestIp from 'request-ip';
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const userIp = getCookie("user-ip", { req, res });
-
+  const reqIp = requestIp.getClientIp(req);
+  const userIp = reqIp ? reqIp : getCookie("user-ip", { req, res });
+  
   const {
     body,
     method,

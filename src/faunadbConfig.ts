@@ -17,7 +17,7 @@ export default faunaClient;
 
 
 export const pollsCollectionName: string = 'Polls';
-export const pollsPaginationIndexName: string = 'polls_pagination';
+export const pollsVotesByPollIpIndexName: string = 'votes_by_poll_and_ip';
 
 
 // On first run, make sure that all collections and indexes exists
@@ -34,15 +34,22 @@ const dbFactory = async () => {
 
   await faunaClient.query(
     q.If(
-      q.Exists(q.Index(pollsPaginationIndexName)),
+      q.Exists(q.Index(pollsVotesByPollIpIndexName)),
       null,
       q.CreateIndex({
-        name: pollsPaginationIndexName,
+        name: pollsVotesByPollIpIndexName,
         source: q.Collection(pollsCollectionName),
-        values: [{ field: ['ref'] }],
+        terms: [
+          {
+            field: ['ref', 'id'],
+          },
+          {
+            field: ['data', 'choices', 'votes', 'voter_ip'],
+          },
+        ],
       })
     )
   )
-  .then(() => console.log(`Pagination index - "${pollsPaginationIndexName}" created successfully!`))
-  .catch((err) => console.log(`Error while creating pagination index - "${pollsPaginationIndexName}": ${err}`))
+  .then(() => console.log(`Index - "${pollsVotesByPollIpIndexName}" created successfully!`))
+  .catch((err) => console.log(`Error while creating index - "${pollsVotesByPollIpIndexName}": ${err}`))
 };

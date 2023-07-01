@@ -1,27 +1,61 @@
 import { useRouter } from 'next/router';
-import { Grid, Text, Center, Loader, Space, Title, Container, Radio, Button, Group, Box } from '@mantine/core';
+import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
+import Head from 'next/head';
+import { useState, useEffect } from 'react';
+import { Grid, Text, Center, Loader, Space, Title, Container, Radio, Button, 
+  Group, Box, Progress, Transition, CopyButton, ActionIcon } from '@mantine/core';
 import { CustomAlert } from '@/components/Alert/Alert';
 import { useForm, isNotEmpty } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { useState, useEffect } from 'react';
+import { IconShare, IconCheck } from '@tabler/icons';
+import { getCookie, CookieValueTypes } from 'cookies-next';
+import requestIp from 'request-ip';
 import useSWR from 'swr';
 import fetcher from '@/swr';
 import axios from 'axios';
 
-const PollPage = () => {
+type PollPageData = {
+  ip: CookieValueTypes;
+};
+
+const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { data, error, isLoading } = useSWR(`/api/polls/${router.query.id}`, fetcher);
   const [ votesAmount, setVotesAmount ] = useState<number>(0);
+  const [ isAlreadyVoted, setIsAlreadyVoted ] = useState<boolean>(false)
+  const [ votedOption, setVoteOption ] = useState<string>("");
+  const [ isAnimate, setIsAnimate ] = useState<boolean>(false);
 
+  // Getting amount of votes, picked vote option and is already voted value
   useEffect(() => {
     if (!error && !isLoading && data) {
-      setVotesAmount(data.choices.reduce((sum: number, choice: Choice) => sum + choice.votes.length, 0));
+      setVotesAmount(data.choices.reduce((sum: number, choice: Choice) => sum + choice.votes.length, 0));      
+      setIsAlreadyVoted(data.choices.some((choice: Choice) => choice.votes.some((vote: Vote) => vote.voter_ip === props.ip)));
+      const votedChoice: Choice = data.choices.find((choice: Choice) => choice.votes.find((vote: Vote) => vote.voter_ip === props.ip));
+      if (isAlreadyVoted && votedChoice) {
+        setVoteOption(votedChoice.text);
+      }
     };
   }, [data, error, isLoading]);
-    
+
+  // Animate votes progressbars
+  useEffect(() => {
+    if (isAlreadyVoted) {
+      setIsAnimate(true);
+    };
+  }, [isAlreadyVoted]);
+
+  // If voted - set value
+  useEffect(() => {
+    form.setFieldValue(
+      'choice', votedOption
+    );
+  }, [votedOption]);
+  
+  
   const form = useForm({
     initialValues: {
-      choice: '',
+      choice: votedOption,
     },
 
     validate: {
@@ -39,15 +73,27 @@ const PollPage = () => {
     event.preventDefault();
     axios.post(`/api/polls/${router.query.id}/vote`, {choice_text: values.choice})
     .then(() => {
+      // Update votes amount and is already voted value
       setVotesAmount((prev) => prev + 1);
+      setIsAlreadyVoted(true);
+
       notifications.show({ message: 'Successfully voted', color: 'green' });
+
+      // Animate votes progressbars
+      if (isAlreadyVoted) {
+        setTimeout(() => {
+          setIsAnimate(true);
+        }, 1000);
+      };
     })
     .catch((error) => {
       notifications.show({ message: error.response.data.error, color: 'red' });
-    })
+    });
   };
-  
-  const rows = ((!error && !isLoading && data) ? (data.is_multiple_answer_options) ?
+
+  // Create radio buttons to vote
+  const voting_options = ((!error && !isLoading && data) ? 
+      (data.is_multiple_answer_options) ?
         (data.choices.map((item: Choice) => (
           <Radio.Group name="pollChoices">
             {item.text}
@@ -59,7 +105,7 @@ const PollPage = () => {
           {...form.getInputProps('choice')}
         >
             {data.choices.map((item: Choice) => (
-              <Radio 
+              <Radio
                 key={item.text} 
                 label={item.text} 
                 value={item.text} 
@@ -73,6 +119,36 @@ const PollPage = () => {
     :
       <></>
   );
+  
+  // Create radio buttons and progress bars to show results
+  const voting_results = ((!error && !isLoading && data) ? 
+      (isAlreadyVoted) ? 
+        (data.is_multiple_answer_options) ?
+          <></>
+        :
+          <Radio.Group 
+            name="choice"
+            {...form.getInputProps('choice')}
+          >
+            {data.choices.map((item: Choice) => (
+              <Group key={item.text} grow mt="lg">
+                <Radio 
+                  label={item.text} 
+                  value={item.text} 
+                  size="md"
+                >
+                </Radio>
+                <Transition mounted={isAnimate} keepMounted transition="fade" duration={500}>
+                  {(styles) => <Progress style={styles} label={`${item.votes.length}`} size="xl" value={(item.votes.length / votesAmount) * 100} />}
+                </Transition>
+              </Group>
+            ))}
+          </Radio.Group>
+      : 
+        <></>
+    :
+      <></>
+  )
 
   return (
     <>
@@ -84,6 +160,10 @@ const PollPage = () => {
             </Center>
           : 
             <>
+              <Head>
+                <title>Survey App - {data.question && data.question}</title>
+              </Head>
+
               <Grid my="xl" align="center" justify="space-between">
                 <Grid.Col sm={9} xs={12}>
                   <Title order={2} fw={400}>
@@ -92,14 +172,27 @@ const PollPage = () => {
                   </Title>
                 </Grid.Col>
                 <Grid.Col span="content">
-                  <Text fs="italic" fz="lg" c="dimmed">
-                    {data.created_at && new Date(data.created_at).toLocaleDateString()}
-                  </Text>
+                  <Group>
+                    <Text fs="italic" fz="lg" c="dimmed">
+                      {data.created_at && new Date(data.created_at).toLocaleDateString()}
+                    </Text>
+                    <CopyButton value={window.location.href}>
+                      {({ copied, copy }) => (
+                        <ActionIcon color={copied ? 'teal' : ''} onClick={copy} >
+                          {copied ? <IconCheck/> : <IconShare/>}
+                        </ActionIcon>
+                      )}
+                    </CopyButton>
+                  </Group>
                 </Grid.Col>
               </Grid>
               <Box component="form" onSubmit={form.onSubmit(handleSubmit, handleError)}>
                 <Title order={3} fw={400}>Voting options:</Title>
-                {rows}
+                <Grid>
+                  <Grid.Col sm={8} xs={12}>
+                    {(isAlreadyVoted) ? voting_results : voting_options}
+                  </Grid.Col>
+                </Grid>
                 <Space h="xl"/>
                 <Group>
                   <Button type="submit" variant="outline" radius="xl">Confrim</Button>
@@ -118,6 +211,17 @@ const PollPage = () => {
       }
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps<PollPageData> = async ({ req, res }) => {
+  const reqIp = requestIp.getClientIp(req);
+  const userIp = reqIp ? reqIp : getCookie("user-ip", { req, res });
+
+  return {
+    props: {
+      ip: userIp
+    }
+  };
 };
 
 export default PollPage;

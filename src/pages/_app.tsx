@@ -4,7 +4,8 @@ import { getCookie, setCookie } from 'cookies-next';
 import Head from 'next/head';
 import { MantineProvider, ColorScheme, ColorSchemeProvider, DefaultMantineColor, Container } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
-import { HeaderSimple } from '@/components/Header/Header';
+import { CustomHeader } from '@/components/Header/Header';
+import { CustomFooter } from '@/components/Footer/Footer';
 import '@/styles/styles.css';
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
@@ -21,7 +22,7 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
   return (
     <>
       <Head>
-        <title>Polls App</title>
+        <title>Survey App</title>
         <meta name="description" content="App for polls" />
         <meta name="viewport" content="minimum-scale=1, initial-scale=1, width=device-width" />
         <link rel="shortcut icon" href="/favicon.ico" />
@@ -35,10 +36,11 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
         }} withGlobalStyles withNormalizeCSS>
 
           <Container className="box">
-            <HeaderSimple/>
+            <CustomHeader/>
             <Container>
               <Component {...pageProps} />
             </Container>
+            <CustomFooter/>
           </Container>
           
           <Notifications />

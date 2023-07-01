@@ -1,3 +1,47 @@
 a, u {
   text-decoration: none;
 }
+
+/* Wave in footer :) */
+
+.waves-container {
+
+  width: 0px;
+  height: 0px;
+
+  transform-style: preserve-3d;
+
+  position: relative;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.waves-container .wave {
+  width: calc(var(--i) * 2px);
+  height: calc(var(--i) * 2px);
+  border: 1px solid white;
+  opacity: 10%;
+  border-radius: 50%;
+
+  position: absolute;
+
+  transform-style: preserve-3d;
+  transform: rotateX(45deg);
+
+  animation: animate1 5s infinite;
+  animation-delay: calc(var(--i) * 0.1s);
+}
+
+@keyframes animate1 {
+
+  0%,
+  100% {
+    transform: rotateX(45deg) translateY(10px);
+  }
+
+  50% {
+    transform: rotateX(45deg) translateY(0);
+  }
+}

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Title, Text, Header, Container, Group, Burger, ActionIcon } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { ColorSchemeToggle } from '@/components/ColorSchemeToggle/ColorSchemeToggle';
@@ -22,7 +21,7 @@ export const HeaderSimple = () => {
           </Title>
         </Link>
         <Group spacing={5}>
-          <Link href="/auth/signin">
+          <Link href="/dashboard">
             <ActionIcon
               size="lg"
               variant="outline"

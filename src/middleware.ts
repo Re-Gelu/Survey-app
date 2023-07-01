@@ -1,18 +1,15 @@
 import { NextRequest, NextResponse, NextFetchEvent } from "next/server";
+import requestIp from 'request-ip';
 
 export async function middleware(request: NextRequest, _next: NextFetchEvent) {
   const res = NextResponse.next();
-  console.log(request);
-  let ip = request.ip ?? request.headers.get('x-real-ip')
-  const forwardedFor = request.headers.get('x-forwarded-for')
-  if(!ip && forwardedFor){
-    ip = forwardedFor.split(',').at(0) ?? 'Unknown'
-  } 
-  if(ip){
+  const ip = requestIp.getClientIp(request);
+
+  if (ip) {
     res.cookies.set("user-ip", ip, {
       httpOnly: false,
     });
-  }
+  };
   
   return res;
-}
+};

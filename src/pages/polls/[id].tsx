@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router';
-import type { InferGetServerSidePropsType, GetServerSideProps } from 'next'
+import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useState, useEffect } from 'react';
 import { Grid, Text, Center, Loader, Space, Title, Container, Radio, Button, 
@@ -13,10 +13,6 @@ import requestIp from 'request-ip';
 import useSWR from 'swr';
 import fetcher from '@/swr';
 import axios from 'axios';
-
-type PollPageData = {
-  ip: CookieValueTypes;
-};
 
 const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
@@ -225,7 +221,7 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
   );
 };
 
-export const getServerSideProps: GetServerSideProps<PollPageData> = async ({ req, res }) => {
+export const getServerSideProps: GetServerSideProps<PageDataWithIp> = async ({ req, res }) => {
   const reqIp = requestIp.getClientIp(req);
   const userIp = reqIp ? reqIp : getCookie("user-ip", { req, res });
 

@@ -34,3 +34,7 @@ type FaunaPollResponse = {
 type FaunaPollsQueryResponse = {
   data: FaunaPollResponse[]
 };
+
+type PageDataWithIp = {
+  ip: CookieValueTypes;
+};

@@ -13,7 +13,7 @@ const PollPage = () => {
   const { data, error, isLoading } = useSWR(`/api/polls/${router.query.id}`, fetcher);
   const [ votesAmount, setVotesAmount ] = useState<number>(0);
 
- useEffect(() => {
+  useEffect(() => {
     if (!error && !isLoading && data) {
       setVotesAmount(data.choices.reduce((sum: number, choice: Choice) => sum + choice.votes.length, 0));
     };

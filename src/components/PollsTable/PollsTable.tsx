@@ -9,7 +9,7 @@ export const PollsTable = ({ data }: { data: Poll[] }) => {
   const rows = data && data.map((item) => (
     <tr key={item.id && item.id}>
         <td>
-          <Link href={`/${item.id}`}>
+          <Link href={`/polls/${item.id}`}>
             <Group>
               <ActionIcon variant="transparent" className={classes.adapt}><IconArrowBadgeRight size={28} /></ActionIcon>
               <Text fz="xl" fw={400} variant="gradient" className={classes.adaptFont}>

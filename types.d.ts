@@ -2,7 +2,7 @@
 type Choice = {
   id?: string;
   text: string;
-  votes: number;
+  votes: Vote[];
 };
 
 // Тип для опроса
@@ -11,27 +11,26 @@ type Poll = {
   question: string;
   choices: Choice[];
   is_multiple_answer_options: boolean;
-  created_at?: Date;
-  expires_at?: string;
+  creator_ip?: string | CookieValueTypes;
+  created_at?: string | Date;
+  expires_at?: string | Date;
 };
 
 // Тип для голоса
-type Response = {
+type Vote = {
   id?: string;
-  poll_id: string;
-  choice_id: string;
-  voter_ip: string;
-  created_at: string;
+  voter_ip: string | CookieValueTypes;
+  created_at: string | Date;
 };
 
 // Type of Fauna DB response
-type FaunaResponse = {
+type FaunaPollResponse = {
   ref: { id: string };
-  data: Poll[] | Poll;
+  data: Poll | Poll[];
   ts: number;
 };
 
 // Type of Fauna DB query response
-type FaunaQueryResponse = {
-  data: FaunaResponse[]
+type FaunaPollsQueryResponse = {
+  data: FaunaPollResponse[]
 };

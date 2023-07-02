@@ -7,7 +7,6 @@ import useSWR from 'swr';
 import fetcher from '@/swr';
 
 const IndexPage = () => {
-  const [opened, setOpened] = useState(false);
   const { data, error, isLoading } = useSWR('/api/polls?offset=0&page_size=100', fetcher);
   
   return (

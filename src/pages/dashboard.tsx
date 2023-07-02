@@ -1,13 +1,11 @@
 import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
-import { Grid, Text, Center, Loader, Space, Title, Container, Radio, Button, 
-  Group, Box, Progress, Transition, CopyButton, ActionIcon, TextInput, Switch } from '@mantine/core';
-import { useForm } from '@mantine/form';
-import { randomId } from '@mantine/hooks';
-import { IconTrash } from '@tabler/icons-react';
+import { Grid, Space, Title} from '@mantine/core';
 import { PollCreationForm } from '@/components/PollCreationForm/PollCreationForm';
+import { DashboardPollsTable } from '@/components/DashboardPollsTable/DashboardPollsTable';
 import Head from 'next/head';
 import { getCookie } from 'cookies-next';
 import requestIp from 'request-ip';
+
 
 const DashboardPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
 
@@ -28,6 +26,7 @@ const DashboardPage = (props: InferGetServerSidePropsType<typeof getServerSidePr
         <Grid.Col sm={12} md={6}>
           <Title order={3} fw={300} >Your polls:</Title>
           <Space h='xl'/>
+          <DashboardPollsTable {...props}></DashboardPollsTable>
         </Grid.Col>
         
         <Grid.Col sm={12} md={6}>

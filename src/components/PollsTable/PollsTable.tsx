@@ -1,4 +1,4 @@
-import { Table, Group, Text, ScrollArea, Badge, ActionIcon, Grid,ColSpan  } from '@mantine/core';
+import { Table, Group, Text, ScrollArea, Badge, ActionIcon } from '@mantine/core';
 import { IconArrowBadgeRight } from '@tabler/icons-react';
 import Link from 'next/link';
 import useStyles from './PollsTable.styles';
@@ -30,7 +30,7 @@ export const PollsTable = ({ data }: { data: Poll[] }) => {
   ));
 
   return (
-    <ScrollArea mih={200} type="always" offsetScrollbars> 
+    <ScrollArea mih={200} mah={600} type="always" offsetScrollbars> 
       <Table miw={200} verticalSpacing="sm" highlightOnHover>
         <thead>
           <tr>

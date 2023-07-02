@@ -4,6 +4,8 @@ import { getCookie, setCookie } from 'cookies-next';
 import Head from 'next/head';
 import { MantineProvider, ColorScheme, ColorSchemeProvider, DefaultMantineColor, Container } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
+import { DatesProvider } from '@mantine/dates';
+import 'dayjs/locale/ru';
 import { CustomHeader } from '@/components/Header/Header';
 import { CustomFooter } from '@/components/Footer/Footer';
 import '@/styles/styles.css';
@@ -29,22 +31,24 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
       </Head>
 
       <ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
-        <MantineProvider theme={{ 
-          colorScheme: colorScheme, 
-          primaryColor: defaultColor,
-          defaultGradient: { deg: 45, from: defaultColor, to: `${defaultColor}.4` },
-        }} withGlobalStyles withNormalizeCSS>
+        <DatesProvider settings={{ locale: 'ru' }}>
+          <MantineProvider theme={{ 
+            colorScheme: colorScheme, 
+            primaryColor: defaultColor,
+            defaultGradient: { deg: 45, from: defaultColor, to: `${defaultColor}.4` },
+          }} withGlobalStyles withNormalizeCSS>
 
-          <Container className="box">
-            <CustomHeader/>
-            <Container>
-              <Component {...pageProps} />
+            <Container className="box">
+              <CustomHeader/>
+              <Container>
+                <Component {...pageProps} />
+              </Container>
+              <CustomFooter/>
             </Container>
-            <CustomFooter/>
-          </Container>
-          
-          <Notifications />
-        </MantineProvider>
+            
+            <Notifications />
+          </MantineProvider>
+        </DatesProvider>
       </ColorSchemeProvider>
     </>
   );

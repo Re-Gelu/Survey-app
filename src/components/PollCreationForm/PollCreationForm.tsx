@@ -77,6 +77,9 @@ export const PollCreationForm = () => {
         color: 'green',
         icon: <IconCheck />
       });
+      
+      form.reset();
+
       // Refresh SWR data to show actual user polls in DashboardPollsTable
       mutate(`/api/polls?offset=0&page_size=100`);
     })

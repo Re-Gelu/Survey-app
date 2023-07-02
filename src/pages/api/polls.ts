@@ -46,7 +46,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     case 'POST':
 
       // Getting the data from the request
-      const {question, choices, is_multiple_answer_options}: Partial<Poll> = body;
+      const {question, choices, is_multiple_answer_options, expires_at}: Partial<Poll> = body;
 
       // Check if the data is valid
       if (!question || !choices) { 
@@ -68,6 +68,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         choices: choices,
         is_multiple_answer_options: is_multiple_answer_options_final,
         creator_ip: userIp,
+        expires_at: expires_at ? expires_at : undefined,
         created_at: new Date().toJSON()
       };
 

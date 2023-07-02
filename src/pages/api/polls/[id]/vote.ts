@@ -7,7 +7,7 @@ import requestIp from 'request-ip';
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const reqIp = requestIp.getClientIp(req);
   const userIp = reqIp ? reqIp : getCookie("user-ip", { req, res });
-  
+
   const {
     body,
     method,
@@ -16,35 +16,47 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   if (method !== 'POST') {
     res.status(405).end(`Method ${method} Not Allowed`);
-  };
+  }
 
   try {
     // Getting the data from the request
-    const { choice_text }: {choice_text: string} = body;
+    const { choices }: { choices: string[] } = body;
 
     // Check if the data and ip is valid
-    if ( !choice_text ) { res.status(400).json({ "choice_text": "Missing required data" }); return; };
-    if ( !userIp ) { res.status(400).json({ "error": "No ip" }); return; };
-    
+    if (!choices || !Array.isArray(choices)) {
+      res.status(400).json({ "error": "Invalid data format, 'choices' should be an array of strings" });
+      return;
+    }
+    if (!userIp) {
+      res.status(400).json({ "error": "No ip" });
+      return;
+    }
+
+    // Check if any choice is missing or invalid
+    const existingPoll: FaunaPollResponse = await faunaClient.query(
+      q.Get(q.Ref(q.Collection(pollsCollectionName), id))
+    );
+    const pollData = existingPoll.data as Poll;
+    const existingChoices = pollData.choices;
+
+    const validChoices = choices.every(choice =>
+      existingChoices.some((c: any) => c.text === choice)
+    );
+
+    if (!validChoices) {
+      res.status(400).json({ "error": "Invalid choices" });
+      return;
+    }
+
+    // Check if user already voted
     if (await faunaClient.query(q.Exists(
       q.Match(
         q.Index(pollsVotesByPollIpIndexName),
         id as string,
         userIp as string
       )
-    ))) { res.status(400).json({ "error": "Already voted!" }); return; }
-
-    // Getting existing poll choices
-    var existingPoll: FaunaPollResponse = await faunaClient.query(
-      q.Get(q.Ref(q.Collection(pollsCollectionName), id))
-    );
-    const pollData = existingPoll.data as Poll;
-    const choices = pollData.choices;
-
-    // Get choice from existing poll choices 
-    const choice = choices.find((c: any) => c.text === choice_text);
-    if (!choice) {  
-      res.status(400).json({ choice: 'Invalid name' });
+    ))) {
+      res.status(400).json({ "error": "Already voted!" });
       return;
     }
 
@@ -55,11 +67,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     };
 
     // DB Update request
-    var updatedPoll: FaunaPollResponse = await faunaClient.query(
+    const updatedPoll: FaunaPollResponse = await faunaClient.query(
       q.Update(q.Ref(q.Collection(pollsCollectionName), id), {
         data: {
-          choices: choices.map((c: any) => {
-            if (c.text === choice_text) {
+          choices: existingChoices.map((c: any) => {
+            if (choices.includes(c.text)) {
               return {
                 ...c,
                 votes: [...c.votes, vote],

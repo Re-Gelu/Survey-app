@@ -17,42 +17,46 @@ import axios from 'axios';
 
 const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
-  const { data, error, isLoading  } = useSWR(`/api/polls/${router.query.id}`, fetcher);
+  const { data, error, isLoading } = useSWR<Poll, Error>(`/api/polls/${router.query.id}`, fetcher);
   const [ votesAmount, votesAmountHandlers ] = useCounter(0, {min: 0, max: 10000});
-  const [ isAlreadyVoted, setIsAlreadyVoted ] = useState<boolean>(false)
+  const [ isAlreadyVoted, setIsAlreadyVoted ] = useState<boolean>(false);
+  const [ isPollExpired, setIsPollExpired ] = useState<boolean>(false);
   const [ votedOption, setVoteOption ] = useState<string []>([]);
   const [ isAnimate, setIsAnimate ] = useState<boolean>(false);
 
-  // Getting amount of votes, picked vote option and is already voted value
+  // Getting all main states
+  // Getting amount of votes, picked vote option, is already voted value and is poll expired
   useEffect(() => {
     if (!error && !isLoading && data) {
       votesAmountHandlers.set(data.choices.reduce((sum: number, choice: Choice) => sum + choice.votes.length, 0));      
       setIsAlreadyVoted(data.choices.some((choice: Choice) => choice.votes.some((vote: Vote) => vote.voter_ip === props.ip)));
+      if (data.expires_at && (new Date(data.expires_at).getTime() <= new Date().getTime())) {
+        setIsPollExpired(true);
+      };
     };
   }, [data, error, isLoading]);
 
-  // Setting vote options if already voted
+  // Setting vote options if already voted or vote expired
   useEffect(() => {
     if (!error && !isLoading && data) {
-      //const votedChoice: Choice = data.choices.find((choice: Choice) => choice.votes.find((vote: Vote) => vote.voter_ip === props.ip));
       const votedChoice: string[] = data.choices.filter((choice: Choice) =>
         choice.votes.some((vote: Vote) => vote.voter_ip === props.ip)
       )
       .map((choice: Choice) => choice.text);
-      if (isAlreadyVoted && votedChoice) {
+      if (isAlreadyVoted || isPollExpired && votedChoice) {
         setVoteOption(votedChoice);
       };
     };
-  }, [data, error, isLoading, isAlreadyVoted]);
+  }, [data, error, isLoading, isAlreadyVoted, isPollExpired]);
 
-  // Animate votes progressbars
+  // Show votes progressbars if all ok
   useEffect(() => {
-    if (isAlreadyVoted) {
+    if (isAlreadyVoted || isPollExpired) {
       setIsAnimate(true);
     };
-  }, [isAlreadyVoted]);
+  }, [isAlreadyVoted, isPollExpired]);
 
-  // If voted - set value
+  // If voted - set value to form
   useEffect(() => {
     form.setFieldValue(
       'choices', (votedOption.length == 1) ? votedOption[0] : votedOption
@@ -75,7 +79,14 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
   });
 
   const handleError = (errors: typeof form.errors) => {
-    if (errors.choices) {
+    if (isPollExpired || isAlreadyVoted) {
+      notifications.show({ 
+        message: isPollExpired ? 'Time to vote has passed...' : isAlreadyVoted && 'You already voted!', 
+        color: 'red',
+        icon: <IconExclamationMark />
+      });
+    };
+    if (errors.choices && !isPollExpired) {
       notifications.show({ 
         message: 'Please enter the answer', 
         color: 'red',
@@ -86,6 +97,17 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
 
   const handleSubmit = async (values: TransformedValues<typeof form>, event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    // If already voted or poll expired to prevent unnecessary requests to backend
+    if (isPollExpired || isAlreadyVoted) {
+      notifications.show({ 
+        message: isPollExpired ? 'Time to vote has passed...' : isAlreadyVoted && 'You already voted!', 
+        color: 'red',
+        icon: <IconExclamationMark />
+      });
+      return;
+    };
+
     axios.post(`/api/polls/${router.query.id}/vote`, values)
     .then(() => {
       // Update votes amount and is already voted value
@@ -117,7 +139,7 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
     });
   };
 
-  // Create radio buttons to vote
+  // Create buttons to vote
   const voting_options = ((!error && !isLoading && data) ? 
       (data.is_multiple_answer_options) ?
         /* If multiple answer options */
@@ -157,49 +179,46 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
       <></>
   );
   
-  // Create radio buttons and progress bars to show results
+  // Create buttons and progress bars to show results
   const voting_results = ((!error && !isLoading && data) ? 
-      (isAlreadyVoted) ? 
+      (isAlreadyVoted || isPollExpired) ?
         (data.is_multiple_answer_options) ?
-          /* If multiple answer options */
-          <Checkbox.Group 
-            {...form.getInputProps('choices')}
-          >
-            {data.choices.map((item: Choice) => (
+          // If already voted or poll expired
+          // If multiple answer options
+            data.choices.map((item: Choice) => (
               <Group key={item.text} grow mt="lg">
                 <Checkbox  
                   label={item.text} 
-                  value={item.text} 
                   size="md"
+                  disabled={!(item.text === votedOption[0])}
+                  checked={item.text === votedOption[0]}
                 >
                 </Checkbox>
                 <Transition mounted={isAnimate} keepMounted transition="fade" duration={500}>
                   {(styles) => <Progress style={styles} label={`${item.votes.length}`} size="xl" value={(item.votes.length / votesAmount) * 100} />}
                 </Transition>
               </Group>
-            ))}
-          </Checkbox.Group>
+            ))
         : 
-          /* If not multiple answer options */
-          <Radio.Group 
-            name="choices"
-            {...form.getInputProps('choices')}
-          >
-            {data.choices.map((item: Choice) => (
+          // If not already voted or poll expired
+          // If not multiple answer options
+            data.choices.map((item: Choice) => (
               <Group key={item.text} grow mt="lg">
                 <Radio 
                   label={item.text} 
                   value={item.text} 
                   size="md"
+                  disabled={!(item.text === votedOption[0])}
+                  checked={item.text === votedOption[0]}
                 >
                 </Radio>
                 <Transition mounted={isAnimate} keepMounted transition="fade" duration={500}>
                   {(styles) => <Progress style={styles} label={`${item.votes.length}`} size="xl" value={(item.votes.length / votesAmount) * 100} />}
                 </Transition>
               </Group>
-            ))}
-          </Radio.Group>
+            ))
       : 
+        // If not already voted or poll expired
         <></>
     :
       <></>
@@ -213,13 +232,13 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
             <Center mx="xl" my="xl" px="xl" py="xl">
                 <Loader size="xl" variant="dots"/>
             </Center>
-          : 
+          : (data) &&
             <>
               <Head>
                 <title>Survey App - {data.question && data.question}</title>
               </Head>
 
-              <Grid my="xl" align="center" justify="space-between">
+              <Grid my="xl" justify="space-between">
                 <Grid.Col sm={6} xs={12}>
                   <Title order={2} fw={400}>
                     Current poll theme: 
@@ -249,13 +268,14 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
                       )}
                     </CopyButton>
                   </Group>
+                  {isPollExpired && <Text fs="italic" fz="xl" c="dimmed" variant="gradient" >Poll expired</Text>} 
                 </Grid.Col>
               </Grid>
               <Box component="form" onSubmit={form.onSubmit(handleSubmit, handleError)}>
                 <Title order={3} fw={400}>Voting options:</Title>
                 <Grid>
                   <Grid.Col sm={8} xs={12}>
-                    {(isAlreadyVoted) ? voting_results : voting_options}
+                    {(isAlreadyVoted || isPollExpired) ? voting_results : voting_options}
                   </Grid.Col>
                 </Grid>
                 <Space h="xl"/>

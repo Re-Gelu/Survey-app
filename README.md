@@ -31,14 +31,14 @@ Expectations:
     CreateCollection({ name: "pollsCollectionName" });
     ```
   - ```
-      CreateIndex({
-        name: "pollsVotesByPollIpIndexName",
-        source: Collection("pollsCollectionName"),
-        terms: [
-          { field: ["ref", "id"] },
-          { field: ["data", "choices", "votes", "voter_ip"] },
-        ],
-      })
+    CreateIndex({
+      name: "pollsVotesByPollIpIndexName",
+      source: Collection("pollsCollectionName"),
+      terms: [
+        { field: ["ref", "id"] },
+        { field: ["data", "choices", "votes", "voter_ip"] },
+      ],
+    })
     ```
 3) Create server database key on FaunaDB Security page
 4) Set this key in enviroment variables (for example in .env file)

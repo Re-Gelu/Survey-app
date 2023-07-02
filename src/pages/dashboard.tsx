@@ -23,13 +23,13 @@ const DashboardPage = (props: InferGetServerSidePropsType<typeof getServerSidePr
           <Space h='xl'/>
         </Grid.Col>
 
-        <Grid.Col sm={12} md={6}>
+        <Grid.Col xs={12} sm={6}>
           <Title order={3} fw={300} >Your polls:</Title>
           <Space h='xl'/>
           <DashboardPollsTable {...props}></DashboardPollsTable>
         </Grid.Col>
         
-        <Grid.Col sm={12} md={6}>
+        <Grid.Col xs={12} sm={6}>
           <Title order={3} fw={300} >Create new poll</Title>
           <Space h='xl'/>
           <PollCreationForm></PollCreationForm>

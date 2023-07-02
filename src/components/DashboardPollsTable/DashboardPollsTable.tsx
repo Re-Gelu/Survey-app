@@ -1,7 +1,7 @@
-import { Grid, Text, Center, Loader, Space, Title, Container, Table, Button, ScrollArea,
-  Group, Box, Progress, Transition, Modal, ActionIcon, Tooltip } from '@mantine/core';
+import { Text, Center, Loader, Title, Container, 
+  Table, Button, ScrollArea, Group, Modal, ActionIcon } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconArrowBadgeRight, IconTrash, IconShare, IconCheck, IconExclamationMark, IconSkull } from '@tabler/icons-react';
+import { IconArrowBadgeRight, IconTrash, IconCheck, IconSkull } from '@tabler/icons-react';
 import { CustomAlert } from '@/components/Alert/Alert';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -98,7 +98,7 @@ export const DashboardPollsTable = (props: PageDataWithIp) => {
             <Loader size="xl" variant="dots"/>
         </Center>
       : 
-        <ScrollArea mih={80} mah={600} type="always" offsetScrollbars> 
+        <ScrollArea mih={80} h={600} type="always" offsetScrollbars> 
           <Table miw={200} verticalSpacing="sm" highlightOnHover>
             <thead>
             </thead>

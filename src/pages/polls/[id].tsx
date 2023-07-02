@@ -6,9 +6,10 @@ import { Grid, Text, Center, Loader, Space, Title, Container, Radio, Button,
   Group, Box, Progress, Transition, CopyButton, ActionIcon } from '@mantine/core';
 import { CustomAlert } from '@/components/Alert/Alert';
 import { useForm, isNotEmpty } from '@mantine/form';
+import { useCounter } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconShare, IconCheck, IconExclamationMark, IconSkull, } from '@tabler/icons';
-import { getCookie, CookieValueTypes } from 'cookies-next';
+import { getCookie } from 'cookies-next';
 import requestIp from 'request-ip';
 import useSWR from 'swr';
 import fetcher from '@/swr';
@@ -17,7 +18,7 @@ import axios from 'axios';
 const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
   const { data, error, isLoading } = useSWR(`/api/polls/${router.query.id}`, fetcher);
-  const [ votesAmount, setVotesAmount ] = useState<number>(0);
+  const [ votesAmount, votesAmountHandlers ] = useCounter(0, {min: 0, max: 10000});
   const [ isAlreadyVoted, setIsAlreadyVoted ] = useState<boolean>(false)
   const [ votedOption, setVoteOption ] = useState<string>("");
   const [ isAnimate, setIsAnimate ] = useState<boolean>(false);
@@ -25,7 +26,7 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
   // Getting amount of votes, picked vote option and is already voted value
   useEffect(() => {
     if (!error && !isLoading && data) {
-      setVotesAmount(data.choices.reduce((sum: number, choice: Choice) => sum + choice.votes.length, 0));      
+      votesAmountHandlers.set(data.choices.reduce((sum: number, choice: Choice) => sum + choice.votes.length, 0));      
       setIsAlreadyVoted(data.choices.some((choice: Choice) => choice.votes.some((vote: Vote) => vote.voter_ip === props.ip)));
       const votedChoice: Choice = data.choices.find((choice: Choice) => choice.votes.find((vote: Vote) => vote.voter_ip === props.ip));
       if (isAlreadyVoted && votedChoice) {
@@ -74,7 +75,7 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
     axios.post(`/api/polls/${router.query.id}/vote`, {choice_text: values.choice})
     .then(() => {
       // Update votes amount and is already voted value
-      setVotesAmount((prev) => prev + 1);
+      votesAmountHandlers.increment();
       setIsAlreadyVoted(true);
 
       notifications.show({ 

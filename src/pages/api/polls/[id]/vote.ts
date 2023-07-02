@@ -46,7 +46,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!validChoices) {
       res.status(400).json({ "error": "Invalid choices" });
       return;
-    }
+    };
+
+    // Check time
+    if (pollData.expires_at && (new Date(pollData.expires_at).getTime() <= new Date().getTime())) {
+      res.status(400).json({ "error": "Attempt to vote after the end of the survey" });
+      return;
+    };
 
     // Check if user already voted
     if (await faunaClient.query(q.Exists(

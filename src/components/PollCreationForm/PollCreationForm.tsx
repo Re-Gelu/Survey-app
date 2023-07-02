@@ -15,14 +15,19 @@ export const PollCreationForm = () => {
       expires_at: null,
     },
     validate: {
-      question: hasLength({min: 1, max: 100}),
+      question: hasLength({min: 1, max: 200}),
       choices: {
-        text: (value, values) => (value.length >= 1 && value.length <= 100 && 
-          values.choices.some((choice, index) =>
+        text: (value, values) => {
+          if (!(value.length >= 1 && value.length <= 100)) {
+            return true;
+          };
+
+          return values.choices.some((choice, index) =>
             values.choices.slice(index + 1).some(otherChoice =>
               choice.text.trim().toLowerCase() === otherChoice.text.trim().toLowerCase()
-          )
-        ))
+            )
+          );
+        }
       }
     },
   });

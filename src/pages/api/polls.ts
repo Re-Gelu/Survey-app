@@ -53,12 +53,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(400).json({ "error": "Missing required data" }); 
         break;
       };
-      if (!(question.length >= 1 && question.length <= 250)) {
-        res.status(400).json({ "question": "Question length must be 1 <= N <= 250" }); 
+      if (!(question.length >= 1 && question.length <= 200)) {
+        res.status(400).json({ "question": "Question length must be 1 <= N <= 200" }); 
         break;
-      }
-      if (!(choices.length > 1 && choices.length <= 10)) {
+      };
+      if (!(choices.length >= 1 && choices.length <= 10)) {
         res.status(400).json({ "choices": "Choices length must be 1 < N <= 10" }); 
+        break;
+      };
+      if (choices.some((choice, index) =>
+        choices.slice(index + 1).some(otherChoice =>
+          choice.text.trim().toLowerCase() === otherChoice.text.trim().toLowerCase()
+      ))) {
+        res.status(400).json({ "choices": "Two or more equal choices" }); 
+        break;
+      };
+      if (!choices.every(choice => choice.text.length >= 1 && choice.text.length <= 100)) {
+        res.status(400).json({ "choices": "Choice text length must be 1 =< N <= 100" }); 
         break;
       }
       const is_multiple_answer_options_final: boolean = (typeof(is_multiple_answer_options) === "undefined") ? false : is_multiple_answer_options;

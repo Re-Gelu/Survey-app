@@ -17,7 +17,7 @@ export const DashboardPollsTable = (props: PageDataWithIp) => {
   const filteredPolls: Poll[] = ((!error && !isLoading && data) ? 
       data.data.filter((poll: Poll )=> poll.creator_ip === props.ip) 
     : 
-      undefined
+      null
   );
 
   const handleDeletion = async (id: string | undefined) => {
@@ -45,7 +45,7 @@ export const DashboardPollsTable = (props: PageDataWithIp) => {
     setTransitionOpened(false);
   };
 
-  const user_polls = ((filteredPolls) ? 
+  const user_polls = ((filteredPolls.length >= 1) ? 
       filteredPolls.map((item) => (
         <tr key={item.id && item.id}>
           <td>
@@ -85,7 +85,7 @@ export const DashboardPollsTable = (props: PageDataWithIp) => {
     :
       <tr>
         <td>
-          <Text fz="xl" fw={400} variant="gradient">
+          <Text fz="xl" fw={400} variant="gradient" my="xl" py="xl">
             Nothing here for now :)
           </Text>
         </td>
@@ -99,7 +99,7 @@ export const DashboardPollsTable = (props: PageDataWithIp) => {
             <Loader size="xl" variant="dots"/>
         </Center>
       : 
-        <ScrollArea mih={200} mah={600} type="always" offsetScrollbars> 
+        <ScrollArea mih={80} mah={600} type="always" offsetScrollbars> 
           <Table miw={200} verticalSpacing="sm" highlightOnHover>
             <thead>
             </thead>

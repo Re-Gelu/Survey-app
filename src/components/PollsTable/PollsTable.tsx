@@ -20,11 +20,13 @@ export const PollsTable = ({ data }: { data: Poll[] }) => {
         </td>
         <td>{item.created_at && new Date(item.created_at).toLocaleDateString()}</td>
         <td>
-          {Math.random() > 0.5 ? (
-            <Badge fullWidth>Active</Badge>
-          ) : (
-            <Badge color="gray" fullWidth>Finished</Badge>
-          )}
+          {item.expires_at ? (new Date(item.expires_at).getTime() >= new Date().getTime()) ? 
+                <Badge fullWidth>Active</Badge>
+              : 
+                <Badge color="gray" fullWidth>Finished</Badge>
+            : 
+              <Badge fullWidth>Active</Badge>
+          }
         </td>
     </tr>
   ));

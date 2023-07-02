@@ -7,7 +7,7 @@ import useSWR from 'swr';
 import fetcher from '@/swr';
 
 const IndexPage = () => {
-  const { data, error, isLoading } = useSWR('/api/polls?offset=0&page_size=100', fetcher);
+  const { data, error, isLoading } = useSWR<{data: Poll[]}, Error>('/api/polls?offset=0&page_size=100', fetcher);
   
   return (
     <>
@@ -44,7 +44,7 @@ const IndexPage = () => {
               <Center mx="xl" my="xl" px="xl" py="xl">
                 <Loader size="xl" variant="dots"/>
               </Center>
-            :
+            : (data) &&
               <PollsTable data={data.data}></PollsTable>
           : 
             <Container size="sm" my="xl" px="xl" py="xl">

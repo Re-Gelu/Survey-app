@@ -12,9 +12,9 @@ import useStyles from './DashboardPollsTable.styles';
 
 export const DashboardPollsTable = (props: PageDataWithIp) => {
   const { classes, cx } = useStyles();
-  const { data, error, isLoading  } = useSWR(`/api/polls?offset=0&page_size=100`, fetcher);
+  const { data, error, isLoading  } = useSWR<{data: Poll[]}, Error>(`/api/polls?offset=0&page_size=100`, fetcher);
   const [transitionOpened, setTransitionOpened] = useState<boolean>(false);
-  const filteredPolls: Poll[] = ((!error && !isLoading && data) ? 
+  const filteredPolls: Poll[] | null = ((!error && !isLoading && data) ? 
       data.data.filter((poll: Poll )=> poll.creator_ip === props.ip) 
     : 
       null

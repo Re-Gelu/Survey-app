@@ -105,7 +105,7 @@ export const PollCreationForm = () => {
         sx={{ flex: 1 }}
         {...form.getInputProps(`choices.${index}.text`)}
       />
-      <ActionIcon color="red" onClick={() => handleChoiceRemoving(index)}>
+      <ActionIcon title={`Remove choice - ${index}`} color="red" onClick={() => handleChoiceRemoving(index)}>
         <IconTrash size="1rem" />
       </ActionIcon>
     </Group>

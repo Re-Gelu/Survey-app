@@ -21,7 +21,6 @@ export const DashboardPollsTable = (props: PageDataWithIp) => {
   );
 
   const handleDeletion = async (id: string | undefined) => {
-    console.log(id);
     if (!id) { return };
     axios.delete(`/api/polls/${id}`)
     .then(() => {
@@ -59,7 +58,7 @@ export const DashboardPollsTable = (props: PageDataWithIp) => {
                 </Group>
               </Link>
               <Group position="right">
-                <ActionIcon color="red" onClick={() => setTransitionOpened(true)}>
+                <ActionIcon title={`Delete poll - ${item.question && item.question}`} color="red" onClick={() => setTransitionOpened(true)}>
                   <IconTrash size="1rem"/>
                 </ActionIcon>
               </Group>

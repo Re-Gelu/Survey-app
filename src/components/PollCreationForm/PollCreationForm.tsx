@@ -7,12 +7,12 @@ import { IconTrash } from '@tabler/icons-react';
 export const PollCreationForm = () => {
   const form = useForm({
     initialValues: {
-      choices: [{ text: '', votes: [] }],
-    },
+      choices: [{ text: '', votes: []}],
+    },  
   });
 
   const fields = form.values.choices.map((item, index) => (
-    <Group key={randomId()} mt="xs">
+    <Group key={index} mt="xs">
       <TextInput
         placeholder="Your poll question"
         withAsterisk

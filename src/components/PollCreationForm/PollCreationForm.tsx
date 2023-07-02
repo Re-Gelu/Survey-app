@@ -119,23 +119,24 @@ export const PollCreationForm = () => {
   return (
     <Box maw={500} mx="auto" component="form" onSubmit={form.onSubmit(handleSubmit, handleError)}>
       <TextInput
-        placeholder="Who is me?"
+        placeholder="To be or not to be?"
         label="Your question"
         withAsterisk
         mb="xl"
         {...form.getInputProps(`question`)}
       />
       {fields.length > 0 ? (
-        <Text weight={500} size="sm" sx={{ flex: 1 }}>
-          Choices
-        </Text>
+        <>
+          <Text weight={500} size="sm" sx={{ flex: 1 }}>
+            Choices
+          </Text>
+          {fields}
+        </>
       ) : (
         <Text color="dimmed" align="center" my="xl">
           No one here...  :(
         </Text>
       )}
-
-      {fields}
 
       <Group position="center" mt="md">
         <Button
@@ -162,7 +163,7 @@ export const PollCreationForm = () => {
       </Group>
 
       <Group position="center" mt="md">
-        <Button type="submit" variant="outline" radius="xl">Confrim</Button>
+        <Button type="submit" variant="outline" radius="xl" px="xl">Confrim</Button>
       </Group>
     </Box>
   );

@@ -1,6 +1,6 @@
 import { Text, Button, Group, Box, ActionIcon, TextInput, Switch } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
-import { useForm, hasLength } from '@mantine/form';
+import { useForm, hasLength, matchesField } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconTrash, IconCheck, IconExclamationMark, IconSkull } from '@tabler/icons';
 import { mutate } from 'swr';
@@ -17,7 +17,12 @@ export const PollCreationForm = () => {
     validate: {
       question: hasLength({min: 1, max: 100}),
       choices: {
-        text: hasLength({min: 1, max: 100}),
+        text: (value, values) => (value.length >= 1 && value.length <= 100 && 
+          values.choices.some((choice, index) =>
+            values.choices.slice(index + 1).some(otherChoice =>
+              choice.text.trim().toLowerCase() === otherChoice.text.trim().toLowerCase()
+          )
+        ))
       }
     },
   });
@@ -61,9 +66,9 @@ export const PollCreationForm = () => {
       key.startsWith('choices.') && key.endsWith('.text') && errors[key]
     )) {
       notifications.show({ 
-        message: 'Poll choices must be from 1 to 100 letters long', 
+        message: 'Look what you wrote in the choice fields fucker!', 
         color: 'red',
-        icon: <IconExclamationMark />
+        icon: <IconSkull />
       });
     };
   };
@@ -77,7 +82,7 @@ export const PollCreationForm = () => {
         color: 'green',
         icon: <IconCheck />
       });
-      
+
       form.reset();
 
       // Refresh SWR data to show actual user polls in DashboardPollsTable

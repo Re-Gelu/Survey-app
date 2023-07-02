@@ -45,7 +45,7 @@ export const DashboardPollsTable = (props: PageDataWithIp) => {
     setTransitionOpened(false);
   };
 
-  const user_polls = ((filteredPolls.length >= 1) ? 
+  const user_polls = ((filteredPolls && filteredPolls.length >= 1) ? 
       filteredPolls.map((item) => (
         <tr key={item.id && item.id}>
           <td>

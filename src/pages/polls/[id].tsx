@@ -3,7 +3,7 @@ import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useState, useEffect } from 'react';
 import { Grid, Text, Center, Loader, Space, Title, Container, Radio, Button, 
-  Group, Box, Progress, Transition, CopyButton, ActionIcon } from '@mantine/core';
+  Group, Box, Progress, Transition, CopyButton, ActionIcon, Tooltip } from '@mantine/core';
 import { CustomAlert } from '@/components/Alert/Alert';
 import { useForm, isNotEmpty } from '@mantine/form';
 import { useCounter } from '@mantine/hooks';
@@ -187,9 +187,11 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
                     </Text>
                     <CopyButton value={window.location.href}>
                       {({ copied, copy }) => (
-                        <ActionIcon color={copied ? 'teal' : undefined} onClick={copy} >
-                          {copied ? <IconCheck /> : <IconShare stroke={1} />}
-                        </ActionIcon>
+                        <Tooltip label={copied ? 'Copied' : 'Copy'} position="bottom-end">
+                          <ActionIcon color={copied ? 'teal' : undefined} onClick={copy} >
+                            {copied ? <IconCheck /> : <IconShare stroke={1} />}
+                          </ActionIcon>
+                        </Tooltip>
                       )}
                     </CopyButton>
                   </Group>

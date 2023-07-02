@@ -1,6 +1,6 @@
-# Survey app
+# :poop:  Survey app
 
-## Task for project
+## :grey_question: Task for project
 Tools: Next.js, TypeScript, FaunaDB, Mantine UI
 
 Description:
@@ -23,7 +23,7 @@ Expectations:
 - Code should be clean and modular.
 - UI can be simple, but the application should be user-friendly.
 
-## Project Launch Guide
+## :wrench: Project Launch Guide
 
 1) Create FaunaDB account and empty database
 2) Exec this FQL queries in FaunaDB FQL Shell or run `dbFactory` method in `src/faunadbConfig.ts`

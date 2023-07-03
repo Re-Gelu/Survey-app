@@ -59,16 +59,22 @@ const IndexPage = () => {
 };
 
 export const getServerSideProps: GetServerSideProps<Pick<PageDataWithIp, 'fallback'>> = async (context) => {
-  // Getting prerendered data
-  const data = await fetcher('/api/polls?offset=0&page_size=100');
+  try {
+    // Getting prerendered data
+    const data = await fetcher('/api/polls?offset=0&page_size=100');
 
-  return {
-    props: {
-      fallback: {
-        '/api/polls?offset=0&page_size=100': data
+    return {
+      props: {
+        fallback: {
+          '/api/polls?offset=0&page_size=100': data
+        }
       }
-    }
-  };
+    };
+  } catch {
+    return {
+      props: {}
+    };
+  }
 };
 
 export default function SWRPrerenderedPage({ fallback }: InferGetServerSidePropsType<typeof getServerSideProps>) {

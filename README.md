@@ -46,7 +46,7 @@ Expectations:
 >   })
 >   ```
 
-## Features
+## Features and thoughts (You must read it! (At least thoughts...))
 
 - Color scheme is stored in cookie to avoid color scheme mismatch after hydration
 - IP checking by middleware and getServerSideProps
@@ -54,9 +54,11 @@ Expectations:
 - They can also choose the expiration date of the survey. If you don't choose anything, the polls will be endless.
 - On poll page users have share button. If it clicked unique generated URL copied.
 
-> It was decided not to divide the database and many aspects in the code into modules. Since many parts of the code are unique (for example, FQL queries) and cannot be reused, and using a database in such a small project is easier without creating multiple collections.
+> For such projects, conventional SSR rendering is poorly suited, so serverside and clientside SWR hooks were used to pre-render data for better SEO and then conveniently real-time update them.
 
-> For such projects, conventional SSR rendering is poorly suited, so serverside and clientside SWR hooks were used to pre-render data and then conveniently update them.
+> As a minus, I can highlight the absence of any authorization (If you think about it... then it wasn't specified in the requirements of the project and everything is fine...). But I tried to compensate for this by using IP as a unique user ID. The user has a dashboard in which the votes created from his IP are shown and only he can delete them.
+
+> It was decided not to divide the database and many aspects in the code into modules. Since many parts of the code are unique (for example, FQL queries) and cannot be reused, and using a database in such a small project is easier without creating multiple collections.
 
 ## :sleeping: REST API
 
@@ -103,6 +105,10 @@ Expectations:
 > Image 5 -Poll page after poll expiration
 
 > User cannot vote, he can check other users answers
+
+![image](https://github.com/Re-Gelu/Survey-app/assets/75813517/87ef7617-dab3-40e9-ae70-41687634c714)
+> Image 6 -Poll deletion. You can delete poll only if you are creator (checked by IP).
+
 
 ## NPM scripts
 

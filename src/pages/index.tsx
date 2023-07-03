@@ -61,7 +61,7 @@ const IndexPage = () => {
 
 export const getServerSideProps: GetServerSideProps<Pick<PageDataWithIp, 'fallback'>> = async (context) => {
 
-  // Get the nextRequestMeta to can SWR from any server
+  // Get the nextRequestMeta to be able to hook SWR from any server
   const nextRequestMeta = Object.getOwnPropertySymbols(context.req).find((s) => {
     return String(s) === "Symbol(NextRequestMeta)";
   });

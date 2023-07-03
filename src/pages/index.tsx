@@ -2,9 +2,10 @@ import { PollsTable } from '@/components/PollsTable/PollsTable';
 import { CustomAlert } from '@/components/Alert/Alert';
 import { SurveyStepper } from '@/components/SurveyStepper/SurveyStepper';
 import { Grid, Text, Center, Loader, Space, Title, Paper, Container, Blockquote } from '@mantine/core';
-import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
+import type { InferGetServerSidePropsType, GetServerSideProps, NextApiRequest } from 'next';
 import useSWR, { SWRConfig } from 'swr';
 import fetcher from '@/swr';
+import { useRouter } from 'next/router';
 
 const IndexPage = () => {
   const { data, error, isLoading } = useSWR<{data: Poll[]}, Error>('/api/polls?offset=0&page_size=100', fetcher);
@@ -59,27 +60,45 @@ const IndexPage = () => {
 };
 
 export const getServerSideProps: GetServerSideProps<Pick<PageDataWithIp, 'fallback'>> = async (context) => {
-  try {
-    // Getting prerendered data
-    const data = await fetcher('/api/polls?offset=0&page_size=100');
 
-    return {
-      props: {
-        fallback: {
-          '/api/polls?offset=0&page_size=100': data
+  // Get the nextRequestMeta to can SWR from any server
+  const nextRequestMeta = Object.getOwnPropertySymbols(context.req).find((s) => {
+    return String(s) === "Symbol(NextRequestMeta)";
+  });
+
+  if (nextRequestMeta) {
+    const nextRequestMetaData = (context.req as unknown as { [key: symbol]: any })[nextRequestMeta];
+
+    try {
+      // Getting prerendered data
+      const data = await fetcher(`${nextRequestMetaData._protocol}://${context.req.headers.host}/api/polls?offset=0&page_size=100`);
+
+      return {
+        props: {
+          fallback: {
+            '/api/polls?offset=0&page_size=100': data
+          }
         }
-      }
-    };
-  } catch (err) {
-    console.warn(err);
-    return {
-      props: {
-        fallback: {
-          '/api/polls?offset=0&page_size=100': {}
+      };
+    } catch (err) {
+      console.warn(err);
+      return {
+        props: {
+          fallback: {
+            '/api/polls?offset=0&page_size=100': null
+          }
         }
+      };
+    }
+  };
+
+  return {
+    props: {
+      fallback: {
+        '/api/polls?offset=0&page_size=100': null
       }
-    };
-  }
+    }
+  };
 };
 
 export default function SWRPrerenderedPage({ fallback }: InferGetServerSidePropsType<typeof getServerSideProps>) {

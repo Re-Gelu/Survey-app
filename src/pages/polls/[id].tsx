@@ -309,30 +309,49 @@ export const getServerSideProps: GetServerSideProps<PageDataWithIp> = async (con
   // Getting IP
   const reqIp = requestIp.getClientIp(context.req);
   const userIp = reqIp ? reqIp : getCookie("user-ip", { req: context.req, res: context.res });
-  
-  try {
-    // Getting prerendered data
-    const data = await fetcher(`/api/polls/${context.query.id}`);
 
-    return {
-      props: {
-        ip: userIp,
-        fallback: {
-          [unstable_serialize(`/api/polls/${context.query.id}`)]: data
+  // Get the nextRequestMeta to can SWR from any server
+  const nextRequestMeta = Object.getOwnPropertySymbols(context.req).find((s) => {
+    return String(s) === "Symbol(NextRequestMeta)";
+  });
+
+  if (nextRequestMeta) {
+    const nextRequestMetaData = (context.req as unknown as { [key: symbol]: any })[nextRequestMeta];
+
+    try {
+      // Getting prerendered data
+      const data = await fetcher(`${nextRequestMetaData._protocol}://${context.req.headers.host}/api/polls/${context.query.id}`);
+
+      return {
+        props: {
+          ip: userIp,
+          fallback: {
+            [unstable_serialize(`/api/polls/${context.query.id}`)]: data
+          }
         }
-      }
-    };
-  } catch (err) {
-    console.warn(err);
-    return {
-      props: {
-        ip: userIp,
-        fallback: {
-          [unstable_serialize(`/api/polls/${context.query.id}`)]: {}
+      };
+    } catch (err) {
+      console.warn(err);
+      return {
+        props: {
+          ip: userIp,
+          fallback: {
+            [unstable_serialize(`/api/polls/${context.query.id}`)]: null  
+          }
         }
+      };
+    }
+  };
+  
+  return {
+    props: {
+      ip: userIp,
+      fallback: {
+        [unstable_serialize(`/api/polls/${context.query.id}`)]: null  
       }
-    };
-  }
+    }
+  };
+  
 };
 
 export default function SWRPrerenderedPage({ ip, fallback }: InferGetServerSidePropsType<typeof getServerSideProps>) {

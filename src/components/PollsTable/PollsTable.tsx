@@ -22,7 +22,7 @@ export const PollsTable = ({ data }: { data: Poll[] }) => {
             </Grid>
           </Link>
         </td>
-        <td>{item.created_at && new Date(item.created_at).toLocaleDateString("ru-RU")}</td>
+        <td>{item.created_at && new Date(item.created_at).toLocaleDateString("ru-RU", {timeZone: "Europe/Moscow"})}</td>
         <td>
           {item.expires_at ? (new Date(item.expires_at).getTime() >= new Date().getTime()) ? 
                 <Badge fullWidth>Active</Badge>

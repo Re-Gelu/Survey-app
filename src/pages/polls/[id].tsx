@@ -259,8 +259,8 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
                     {data.expires_at &&  
                       <Text component='span' pl={6} fs="italic" fz="lg" c="dimmed">
                         - {`
-                          ${new Date(data.expires_at).toLocaleDateString("ru-RU")}
-                          ${new Date(data.expires_at).toLocaleTimeString("ru-RU", { hour: 'numeric', minute: 'numeric' })}
+                          ${new Date(data.expires_at).toLocaleDateString("ru-RU", { timeZone: "Europe/Moscow" })}
+                          ${new Date(data.expires_at).toLocaleTimeString("ru-RU", { hour: 'numeric', minute: 'numeric', timeZone: "Europe/Moscow" })}
                         `}
                       </Text>
                     }

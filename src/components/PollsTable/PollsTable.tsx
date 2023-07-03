@@ -1,4 +1,4 @@
-import { Table, Group, Text, ScrollArea, Badge, ActionIcon, Grid } from '@mantine/core';
+import { Table, Text, ScrollArea, Badge, ActionIcon, Grid } from '@mantine/core';
 import { IconArrowBadgeRight } from '@tabler/icons-react';
 import Link from 'next/link';
 import useStyles from './PollsTable.styles';

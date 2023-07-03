@@ -21,7 +21,7 @@ export const pollsVotesByPollIpIndexName: string = 'votes_by_poll_and_ip';
 
 
 // On first run, make sure that all collections and indexes exists
-const dbFactory = async () => {
+export const dbFactory = async () => {
   await faunaClient.query(
     q.If(
       q.Exists(q.Collection(pollsCollectionName)),
@@ -29,8 +29,8 @@ const dbFactory = async () => {
       q.CreateCollection({ name: pollsCollectionName })
     )
   )
-  .then(() => console.log(`Collection - "${pollsCollectionName}" created successfully!`))
-  .catch((err) => console.log(`Error while creating collection - "${pollsCollectionName}": ${err}`))
+  .then(() => console.info(`Collection - "${pollsCollectionName}" created successfully!`))
+  .catch((err) => console.warn(`Error while creating collection - "${pollsCollectionName}": ${err}`))
 
   await faunaClient.query(
     q.If(
@@ -50,6 +50,6 @@ const dbFactory = async () => {
       })
     )
   )
-  .then(() => console.log(`Index - "${pollsVotesByPollIpIndexName}" created successfully!`))
-  .catch((err) => console.log(`Error while creating index - "${pollsVotesByPollIpIndexName}": ${err}`))
+  .then(() => console.info(`Index - "${pollsVotesByPollIpIndexName}" created successfully!`))
+  .catch((err) => console.warn(`Error while creating index - "${pollsVotesByPollIpIndexName}": ${err}`))
 };

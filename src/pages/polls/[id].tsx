@@ -255,7 +255,7 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
               <Grid.Col span="content">
                 <Group spacing="xs">
                   <Text fs="italic" fz="lg" c="dimmed">
-                    {data.created_at && new Date(data.created_at).toLocaleDateString("ru-RU")}
+                    {data.created_at && new Date(data.created_at).toLocaleDateString("ru-RU", { timeZone: "Europe/Moscow" })}
                     {data.expires_at &&  
                       <Text component='span' pl={6} fs="italic" fz="lg" c="dimmed">
                         - {`

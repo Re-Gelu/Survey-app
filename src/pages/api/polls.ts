@@ -39,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       res.status(200).json({
         offset: requestOffset,
         page_size: requestPageSize,
-        data: polls.slice(requestOffset, requestOffset + requestPageSize)
+        data: polls.slice(requestOffset, requestOffset + requestPageSize).reverse()
       });
       break;
 

@@ -8,6 +8,7 @@ import { DatesProvider } from '@mantine/dates';
 import 'dayjs/locale/ru';
 import { CustomHeader } from '@/components/Header/Header';
 import { CustomFooter } from '@/components/Footer/Footer';
+import { SWRConfig } from 'swr';
 import '@/styles/styles.css';
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
@@ -37,15 +38,17 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
             primaryColor: defaultColor,
             defaultGradient: { deg: 45, from: defaultColor, to: `${defaultColor}.4` },
           }} withGlobalStyles withNormalizeCSS>
+              <SWRConfig>
 
-            <Container className="box">
-              <CustomHeader/>
-              <Container>
-                <Component {...pageProps} />
-              </Container>
-              <CustomFooter/>
-            </Container>
-            
+                <Container className="box">
+                  <CustomHeader/>
+                  <Container>
+                    <Component {...pageProps} />
+                  </Container>
+                  <CustomFooter/>
+                </Container>
+                
+              </SWRConfig>
             <Notifications />
           </MantineProvider>
         </DatesProvider>

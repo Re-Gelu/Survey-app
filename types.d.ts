@@ -37,4 +37,5 @@ type FaunaPollsQueryResponse = {
 
 type PageDataWithIp = {
   ip: CookieValueTypes;
+  fallback?: any;
 };

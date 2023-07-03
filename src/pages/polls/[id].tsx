@@ -11,7 +11,7 @@ import { notifications } from '@mantine/notifications';
 import { IconShare, IconCheck, IconExclamationMark, IconSkull } from '@tabler/icons';
 import { getCookie } from 'cookies-next';
 import requestIp from 'request-ip';
-import useSWR, { mutate } from 'swr';
+import useSWR, { mutate, unstable_serialize, SWRConfig } from 'swr';
 import fetcher from '@/swr';
 import axios from 'axios';
 
@@ -101,7 +101,7 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
   // Getting all main states
   // Getting amount of votes, picked vote option, is already voted value and is poll expired
   useEffect(() => {
-    if (!error && !isLoading && data) {
+    if (!error && !isLoading && typeof data === 'object' && data !== null) {
       votesAmountHandlers.set(data.choices.reduce((sum: number, choice: Choice) => sum + choice.votes.length, 0));      
       setIsAlreadyVoted(data.choices.some((choice: Choice) => choice.votes.some((vote: Vote) => vote.voter_ip === props.ip)));
       if (data.expires_at && (new Date(data.expires_at).getTime() <= new Date().getTime())) {
@@ -112,7 +112,7 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
 
   // Setting vote options if already voted or vote expired
   useEffect(() => {
-    if (!error && !isLoading && data) {
+    if (!error && !isLoading && typeof data === 'object' && data !== null) {
       const votedChoice: string[] = data.choices.filter((choice: Choice) =>
         choice.votes.some((vote: Vote) => vote.voter_ip === props.ip)
       )
@@ -138,14 +138,14 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
   }, [votedOption]);
 
   // Create buttons to vote
-  const voting_options = ((!error && !isLoading && data) ? 
+  const voting_options = ((data || !error && !isLoading && data) ? 
       (data.is_multiple_answer_options) ?
         /* If multiple answer options */
         <Checkbox.Group
           defaultValue={votedOption}
           {...form.getInputProps('choices')}
         >
-            {data.choices.map((item: Choice) => (
+            {data.choices && data.choices.map((item: Choice) => (
               <Checkbox
                 key={item.text} 
                 label={item.text} 
@@ -162,7 +162,7 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
           name="choices"
           {...form.getInputProps('choices')}
         >
-            {data.choices.map((item: Choice) => (
+            {data.choices && data.choices.map((item: Choice) => (
               <Radio
                 key={item.text} 
                 label={item.text} 
@@ -178,9 +178,8 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
   );
   
   // Create buttons and progress bars to show results
-  const voting_results = ((!error && !isLoading && data) ? 
+  const voting_results = ((data || !error && !isLoading && data) ? 
       (isAlreadyVoted || isPollExpired) ?
-        
         (data.is_multiple_answer_options) ?
           // If already voted or poll expired
           // If multiple answer options
@@ -227,66 +226,74 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
   return (
     <>
       {
-        (!error) ?
-          (isLoading) ? 
-            <Center mx="xl" my="xl" px="xl" py="xl">
-                <Loader size="xl" variant="dots"/>
-            </Center>
-          : (data) &&
-            <>
-              <Head>
-                <title>Survey App - {data.question && data.question}</title>
-              </Head>
-
-              <Grid my="xl" justify="space-between">
-                <Grid.Col sm={6} xs={12}>
-                  <Title order={2} fw={400}>
-                    Current poll theme: 
-                    <Text inherit fw={200} variant="gradient" component="span" mx="sm">{data.question && data.question}</Text>
-                  </Title>
-                </Grid.Col>
-                <Grid.Col span="content">
-                  <Group spacing="xs">
-                    <Text fs="italic" fz="lg" c="dimmed">
-                      {data.created_at && new Date(data.created_at).toLocaleDateString()}
-                      {data.expires_at &&  
-                        <Text component='span' pl={6} fs="italic" fz="lg" c="dimmed">
-                          - {`
-                            ${new Date(data.expires_at).toLocaleDateString()}
-                            ${new Date(data.expires_at).toLocaleTimeString([], { hour: 'numeric', minute: 'numeric' })}
-                          `}
-                        </Text>
-                      }
-                    </Text>
-                    <CopyButton value={window.location.href}>
-                      {({ copied, copy }) => (
-                        <Tooltip label={copied ? 'Copied' : 'Copy'} position="bottom-end">
-                          <ActionIcon color={copied ? 'teal' : undefined} onClick={copy} >
-                            {copied ? <IconCheck /> : <IconShare stroke={1} />}
-                          </ActionIcon>
-                        </Tooltip>
-                      )}
-                    </CopyButton>
-                  </Group>
-                  {isPollExpired && <Text fs="italic" fz="xl" c="dimmed" variant="gradient" >Poll expired</Text>} 
+        (data) ?
+          <>
+            <Head>
+              <title>{`Survey App - ${data.question}`}</title>
+            </Head>
+            <Grid my="xl" justify="space-between">
+              <Grid.Col sm={6} xs={12}>
+                <Title order={2} fw={400}>
+                  Current poll theme: 
+                  <Text inherit fw={200} variant="gradient" component="span" mx="sm">{data.question && data.question}</Text>
+                </Title>
+              </Grid.Col>
+              <Grid.Col span="content">
+                <Group spacing="xs">
+                  <Text fs="italic" fz="lg" c="dimmed">
+                    {data.created_at && new Date(data.created_at).toLocaleDateString(router.defaultLocale)}
+                    {data.expires_at &&  
+                      <Text component='span' pl={6} fs="italic" fz="lg" c="dimmed">
+                        - {`
+                          ${new Date(data.expires_at).toLocaleDateString(router.defaultLocale)}
+                          ${new Date(data.expires_at).toLocaleTimeString([], { hour: 'numeric', minute: 'numeric' })}
+                        `}
+                      </Text>
+                    }
+                  </Text>
+                  <CopyButton value={(typeof(window) !== 'undefined') ? window.location.href : ''}>
+                    {({ copied, copy }) => (
+                      <Tooltip label={copied ? 'Copied' : 'Copy'} position="bottom-end">
+                        <ActionIcon color={copied ? 'teal' : undefined} onClick={copy} >
+                          {copied ? <IconCheck /> : <IconShare stroke={1} />}
+                        </ActionIcon>
+                      </Tooltip>
+                    )}
+                  </CopyButton>
+                </Group>
+                {isPollExpired && <Text fs="italic" fz="xl" c="dimmed" variant="gradient">Poll expired</Text>} 
+              </Grid.Col>
+            </Grid>
+            <Box component="form" onSubmit={form.onSubmit(handleSubmit, handleError)}>
+              <Title order={3} fw={400}>Voting options:</Title>
+              <Grid>
+                <Grid.Col sm={8} xs={12}>
+                  {
+                    (data) ?
+                      voting_options
+                    : 
+                      (isAlreadyVoted || isPollExpired) ? 
+                        voting_results 
+                      : 
+                        voting_options
+                  }
                 </Grid.Col>
               </Grid>
-              <Box component="form" onSubmit={form.onSubmit(handleSubmit, handleError)}>
-                <Title order={3} fw={400}>Voting options:</Title>
-                <Grid>
-                  <Grid.Col sm={8} xs={12}>
-                    {(isAlreadyVoted || isPollExpired) ? voting_results : voting_options}
-                  </Grid.Col>
-                </Grid>
-                <Space h="xl"/>
-                <Group>
-                  <Button type="submit" variant="outline" radius="xl">Confrim</Button>
-                  <Text c="dimmed">
-                    {votesAmount} votes
-                  </Text>
-                </Group>
-              </Box>
-            </>
+              <Space h="xl"/>
+              <Group>
+                <Button type="submit" variant="outline" radius="xl">Confrim</Button>
+                <Text c="dimmed">
+                  {votesAmount} votes
+                </Text>
+              </Group>
+            </Box>
+          </>
+        :
+          (!error) ?
+            (isLoading) &&
+              <Center mx="xl" my="xl" px="xl" py="xl">
+                  <Loader size="xl" variant="dots"/>
+              </Center>
         : 
           <Container size="sm" my="xl" px="xl" py="xl">
             <CustomAlert>
@@ -298,15 +305,36 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
   );
 };
 
-export const getServerSideProps: GetServerSideProps<PageDataWithIp> = async ({ req, res }) => {
-  const reqIp = requestIp.getClientIp(req);
-  const userIp = reqIp ? reqIp : getCookie("user-ip", { req, res });
+export const getServerSideProps: GetServerSideProps<PageDataWithIp> = async (context) => {
+  // Getting IP
+  const reqIp = requestIp.getClientIp(context.req);
+  const userIp = reqIp ? reqIp : getCookie("user-ip", { req: context.req, res: context.res });
+  
+  try {
+    // Getting prerendered data
+    const data = await fetcher(`/api/polls/${context.query.id}`);
 
-  return {
-    props: {
-      ip: userIp
-    }
-  };
+    return {
+      props: {
+        ip: userIp,
+        fallback: {
+          [unstable_serialize(`/api/polls/${context.query.id}`)]: data
+        }
+      }
+    };
+  } catch (err) {
+    return {
+      props: {
+        ip: userIp
+      }
+    };
+  }
 };
 
-export default PollPage;
+export default function SWRPrerenderedPage({ ip, fallback }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+  return (
+    <SWRConfig value={{ fallback }}>
+      <PollPage ip={ip}/>
+    </SWRConfig>
+  );
+};;

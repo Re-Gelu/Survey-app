@@ -45,9 +45,9 @@ export const PollsTable = ({ data }: { data: Poll[] }) => {
           <Table miw={200} verticalSpacing="sm" highlightOnHover>
             <thead>
               <tr>
-                <th>Question</th>
-                <th>Published</th>
-                <th>Status</th>
+                <th><Text>Question</Text></th>
+                <th><Text align="center">Published</Text></th>
+                <th><Text align="center">Status</Text></th>
               </tr>
             </thead>
             <tbody>{rows}</tbody>

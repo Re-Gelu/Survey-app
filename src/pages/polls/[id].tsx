@@ -326,7 +326,10 @@ export const getServerSideProps: GetServerSideProps<PageDataWithIp> = async (con
     console.warn(err);
     return {
       props: {
-        ip: userIp
+        ip: userIp,
+        fallback: {
+          [unstable_serialize(`/api/polls/${context.query.id}`)]: {}
+        }
       }
     };
   }

@@ -73,7 +73,11 @@ export const getServerSideProps: GetServerSideProps<Pick<PageDataWithIp, 'fallba
   } catch (err) {
     console.warn(err);
     return {
-      props: {}
+      props: {
+        fallback: {
+          '/api/polls?offset=0&page_size=100': {}
+        }
+      }
     };
   }
 };

@@ -3,12 +3,13 @@ import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import Head from 'next/head';
 import { useState, useEffect } from 'react';
 import { Grid, Text, Center, Loader, Space, Title, Container, Radio, Button, 
-  Group, Box, Progress, Transition, CopyButton, ActionIcon, Tooltip, Checkbox } from '@mantine/core';
+  Group, Box, Progress, Transition, Checkbox } from '@mantine/core';
 import { CustomAlert } from '@/components/Alert/Alert';
+import { CustomCopyButton } from '@/components/CopyButton/CopyButton';
 import { useForm, isNotEmpty, TransformedValues } from '@mantine/form';
 import { useCounter } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconShare, IconCheck, IconExclamationMark, IconSkull } from '@tabler/icons';
+import { IconCheck, IconExclamationMark, IconSkull } from '@tabler/icons';
 import { getCookie } from 'cookies-next';
 import requestIp from 'request-ip';
 import useSWR, { mutate, unstable_serialize, SWRConfig } from 'swr';
@@ -265,15 +266,7 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
                       </Text>
                     }
                   </Text>
-                  <CopyButton value={(typeof(window) !== 'undefined') ? window.location.href : ''}>
-                    {({ copied, copy }) => (
-                      <Tooltip label={copied ? 'Copied' : 'Copy'} position="bottom-end">
-                        <ActionIcon color={copied ? 'teal' : undefined} onClick={copy} >
-                          {copied ? <IconCheck /> : <IconShare stroke={1} />}
-                        </ActionIcon>
-                      </Tooltip>
-                    )}
-                  </CopyButton>
+                  <CustomCopyButton value={(typeof(window) !== 'undefined') ? window.location.href : ''}></CustomCopyButton>
                 </Group>
                 {isPollExpired && <Text fs="italic" fz="xl" c="dimmed" variant="gradient">Poll expired</Text>} 
               </Grid.Col>

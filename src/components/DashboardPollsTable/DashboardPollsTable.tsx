@@ -1,5 +1,5 @@
 import { Text, Center, Loader, Title, Container, 
-  Table, Button, ScrollArea, Group, Modal, ActionIcon } from '@mantine/core';
+  Table, Button, ScrollArea, Group, Modal, ActionIcon, Grid } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconArrowBadgeRight, IconTrash, IconCheck, IconSkull } from '@tabler/icons-react';
 import { CustomAlert } from '@/components/Alert/Alert';
@@ -48,21 +48,27 @@ export const DashboardPollsTable = (props: PageDataWithIp) => {
       filteredPolls.map((item) => (
         <tr key={item.id && item.id}>
           <td>
-            <Group position='apart'>
-              <Link href={`/polls/${item.id}`}>
-                <Group>
-                  <ActionIcon variant="transparent" className={classes.adapt}><IconArrowBadgeRight size={24} /></ActionIcon>
-                  <Text fz="xl" fw={400} variant="gradient" className={classes.adaptFont}>
-                    {item.question && item.question}
-                  </Text>
-                </Group>
-              </Link>
-              <Group position="right">
+            <Grid align="center" justify="space-between">
+              <Grid.Col span="auto">
+                <Link href={`/polls/${item.id}`}>
+                  <Grid align="center" justify="space-between">
+                    <Grid.Col span="content" p={0}>
+                      <ActionIcon variant="transparent" className={classes.adapt}><IconArrowBadgeRight size={24} /></ActionIcon>
+                    </Grid.Col>
+                    <Grid.Col span="auto">
+                      <Text fz="xl" fw={400} variant="gradient" className={classes.adaptFont} >
+                        {item.question && item.question}
+                      </Text>
+                    </Grid.Col>
+                  </Grid>
+                </Link>
+              </Grid.Col>
+              <Grid.Col span="content">
                 <ActionIcon title={`Delete poll - ${item.question && item.question}`} color="red" onClick={() => setTransitionOpened(true)}>
                   <IconTrash size="1rem"/>
                 </ActionIcon>
-              </Group>
-            </Group>
+              </Grid.Col>
+            </Grid>
 
             <Modal
               opened={transitionOpened}
@@ -98,7 +104,7 @@ export const DashboardPollsTable = (props: PageDataWithIp) => {
             <Loader size="xl" variant="dots"/>
         </Center>
       : 
-        <ScrollArea mih={80} h={600} type="always" offsetScrollbars> 
+        <ScrollArea mih={80} h={350} type="always" offsetScrollbars> 
           <Table miw={200} verticalSpacing="sm" highlightOnHover>
             <thead>
             </thead>

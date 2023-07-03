@@ -1,4 +1,4 @@
-import { Table, Group, Text, ScrollArea, Badge, ActionIcon } from '@mantine/core';
+import { Table, Group, Text, ScrollArea, Badge, ActionIcon, Grid } from '@mantine/core';
 import { IconArrowBadgeRight } from '@tabler/icons-react';
 import Link from 'next/link';
 import useStyles from './PollsTable.styles';
@@ -10,12 +10,16 @@ export const PollsTable = ({ data }: { data: Poll[] }) => {
     <tr key={item.id && item.id}>
         <td>
           <Link href={`/polls/${item.id}`}>
-            <Group>
-              <ActionIcon variant="transparent" className={classes.adapt}><IconArrowBadgeRight size={28} /></ActionIcon>
-              <Text fz="xl" fw={400} variant="gradient" className={classes.adaptFont}>
-                {item.question && item.question}
-              </Text>
-            </Group>
+            <Grid align="center" justify="space-between">
+              <Grid.Col span="content" p={0}>
+                <ActionIcon variant="transparent" className={classes.adapt}><IconArrowBadgeRight size={28} /></ActionIcon>
+              </Grid.Col>
+              <Grid.Col span="auto">
+                <Text fz="xl" fw={400} variant="gradient" className={classes.adaptFont}>
+                  {item.question && item.question}
+                </Text>
+              </Grid.Col>
+            </Grid>
           </Link>
         </td>
         <td>{item.created_at && new Date(item.created_at).toLocaleDateString()}</td>

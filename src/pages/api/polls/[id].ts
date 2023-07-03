@@ -1,7 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import faunaClient, { q, pollsCollectionName } from '@/faunadbConfig';
+import { getCookie } from 'cookies-next';
+import requestIp from 'request-ip';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const reqIp = requestIp.getClientIp(req);
+  const userIp = reqIp ? reqIp : getCookie("user-ip", { req, res });
 
   const {
     body,
@@ -78,25 +82,50 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       break;
 
     case 'DELETE':
-      // The following query looks a bit complicated, but it:
-      // - avoids trying to delete a Polls document unless it exists
-      // This step prevents problems if another instance of the Polls app (or
-      // the Fauna Dashboard) has already deleted the Todo document.
-      await faunaClient.query(
-        q.Let(
-          {
-            PollsRef: q.Ref(q.Collection(pollsCollectionName), id),
-            PollsExists: q.Exists(q.Var(`${pollsCollectionName}Ref`)),
-          },
-          q.If(
-            q.Var(`${pollsCollectionName}Exists`),
-            q.Delete(q.Ref(q.Collection(pollsCollectionName), id)),
-            null
+      try {
+        // Check if creator ip is valid
+        if (!userIp) {
+          res.status(400).json({ "error": "No ip" });
+          return;
+        }
+        var existingPoll: FaunaPollResponse = await faunaClient.query(
+          q.Get(q.Ref(q.Collection(pollsCollectionName), id))
+        );
+        const pollData = existingPoll.data as Poll;
+        
+        if (pollData.creator_ip && pollData.creator_ip !== userIp) {
+          res.status(400).json({ "error": "You cannot delete it" });
+          return;
+        };
+
+        // The following query looks a bit complicated, but it:
+        // - avoids trying to delete a Polls document unless it exists
+        // This step prevents problems if another instance of the Polls app (or
+        // the Fauna Dashboard) has already deleted the Todo document.
+        await faunaClient.query(
+          q.Let(
+            {
+              PollsRef: q.Ref(q.Collection(pollsCollectionName), id),
+              PollsExists: q.Exists(q.Var(`${pollsCollectionName}Ref`)),
+            },
+            q.If(
+              q.Var(`${pollsCollectionName}Exists`),
+              q.Delete(q.Ref(q.Collection(pollsCollectionName), id)),
+              null
+            )
           )
         )
-      )
-      .catch((err) => console.log(err))
-      res.status(200).json({ message: 'The survey has been deleted successfully' });
+        .then(() => {
+          res.status(200).json({ message: 'The survey has been deleted successfully' });
+          return;
+        })
+        .catch((err) => console.log(err))
+      } catch (err) {
+        // Not found response
+        res.status(404).json({ error: 'Something went wrong...' });
+        return;
+      };
+      
       break;
 
     default:

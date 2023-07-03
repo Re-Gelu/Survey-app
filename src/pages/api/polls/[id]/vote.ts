@@ -26,11 +26,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (!choices || !Array.isArray(choices)) {
       res.status(400).json({ "error": "Invalid data format, 'choices' should be an array of strings" });
       return;
-    }
+    };
     if (!userIp) {
       res.status(400).json({ "error": "No ip" });
       return;
-    }
+    };
 
     // Check if any choice is missing or invalid
     const existingPoll: FaunaPollResponse = await faunaClient.query(
@@ -38,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     );
     const pollData = existingPoll.data as Poll;
     const existingChoices = pollData.choices;
-    
+
     if (!(choices.every(choice =>
       existingChoices.some((c: any) => c.text === choice)
     ))) {
@@ -62,7 +62,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     ))) {
       res.status(400).json({ "error": "Already voted!" });
       return;
-    }
+    };
 
     // Create new vote
     const vote: Vote = {

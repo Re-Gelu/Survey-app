@@ -221,7 +221,21 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
         <></>
     :
       <></>
-  )
+  );
+
+  if (isLoading) {
+    <Center mx="xl" my="xl" px="xl" py="xl">
+        <Loader size="xl" variant="dots"/>
+    </Center>
+  };
+
+  if (error) {
+    <Container size="sm" my="xl" px="xl" py="xl">
+      <CustomAlert>
+        Such a survey no longer exists
+      </CustomAlert>
+    </Container>
+  };
 
   return (
     <>
@@ -246,7 +260,7 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
                       <Text component='span' pl={6} fs="italic" fz="lg" c="dimmed">
                         - {`
                           ${new Date(data.expires_at).toLocaleDateString("ru-RU")}
-                          ${new Date(data.expires_at).toLocaleTimeString([], { hour: 'numeric', minute: 'numeric' })}
+                          ${new Date(data.expires_at).toLocaleTimeString("ru-RU", { hour: 'numeric', minute: 'numeric' })}
                         `}
                       </Text>
                     }
@@ -269,7 +283,7 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
               <Grid>
                 <Grid.Col sm={8} xs={12}>
                   {
-                    (data) ?
+                    (data && !(isAlreadyVoted || isPollExpired)) ?
                       voting_options
                     : 
                       (isAlreadyVoted || isPollExpired) ? 
@@ -289,17 +303,9 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
             </Box>
           </>
         :
-          (!error) ?
-            (isLoading) &&
-              <Center mx="xl" my="xl" px="xl" py="xl">
-                  <Loader size="xl" variant="dots"/>
-              </Center>
-        : 
-          <Container size="sm" my="xl" px="xl" py="xl">
-            <CustomAlert>
-                Such a survey no longer exists
-            </CustomAlert>
-          </Container>
+          <Center mx="xl" my="xl" px="xl" py="xl">
+            <Loader size="xl" variant="dots"/>
+          </Center>
       }
     </>
   );
@@ -310,7 +316,7 @@ export const getServerSideProps: GetServerSideProps<PageDataWithIp> = async (con
   const reqIp = requestIp.getClientIp(context.req);
   const userIp = reqIp ? reqIp : getCookie("user-ip", { req: context.req, res: context.res });
 
-  // Get the nextRequestMeta to can SWR from any server
+  // Get the nextRequestMeta to be able to hook SWR from any server
   const nextRequestMeta = Object.getOwnPropertySymbols(context.req).find((s) => {
     return String(s) === "Symbol(NextRequestMeta)";
   });

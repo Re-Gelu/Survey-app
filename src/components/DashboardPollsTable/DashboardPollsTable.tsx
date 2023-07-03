@@ -14,7 +14,7 @@ export const DashboardPollsTable = (props: PageDataWithIp) => {
   const { classes, cx } = useStyles();
   const { data, error, isLoading  } = useSWR<{data: Poll[]}, Error>(`/api/polls?offset=0&page_size=100`, fetcher);
   const [transitionOpened, setTransitionOpened] = useState<boolean>(false);
-  
+
   const filteredPolls: Poll[] | null = ((!error && !isLoading && data) ? 
       data.data.filter((poll: Poll )=> poll.creator_ip === props.ip) 
     : 
@@ -74,7 +74,7 @@ export const DashboardPollsTable = (props: PageDataWithIp) => {
             <Modal
               opened={transitionOpened}
               onClose={() => setTransitionOpened(false)}
-              title={<Title order={3}>Are you sure about that?</Title>}
+              title={<Text fz="xl">Are you sure about that?</Text>}
               transitionProps={{ transition: 'rotate-left' }}
             >
               <Button 
@@ -89,13 +89,7 @@ export const DashboardPollsTable = (props: PageDataWithIp) => {
         </tr>
       ))
     :
-      <tr>
-        <td>
-          <Text fz="xl" fw={400} variant="gradient" my="xl" py="xl">
-            Nothing here for now :)
-          </Text>
-        </td>
-      </tr>
+      <></>
   );
 
   return (
@@ -105,13 +99,18 @@ export const DashboardPollsTable = (props: PageDataWithIp) => {
             <Loader size="xl" variant="dots"/>
         </Center>
       : 
-        <ScrollArea mih={80} h={350} type="always" offsetScrollbars> 
-          <Table miw={200} verticalSpacing="sm" highlightOnHover>
-            <thead>
-            </thead>
-            <tbody>{user_polls}</tbody>
-          </Table>
-        </ScrollArea>      
+        (filteredPolls && filteredPolls.length >= 1) ? 
+            <ScrollArea mih={80} h={350} type="always" offsetScrollbars> 
+            <Table miw={200} verticalSpacing="sm" highlightOnHover>
+              <thead>
+              </thead>
+              <tbody>{user_polls}</tbody>
+            </Table>
+          </ScrollArea>
+        :
+          <Text fz="xl" fw={400} variant="gradient" my="xl" py="xl">
+            Nothing here for now :)
+          </Text>
     : 
       <Container size="sm" my="xl" px="xl" py="xl">
         <CustomAlert>

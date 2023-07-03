@@ -8,7 +8,7 @@ import fetcher from '@/swr';
 import { useRouter } from 'next/router';
 
 const IndexPage = () => {
-  const { data, error, isLoading } = useSWR<{data: Poll[]}, Error>('/api/polls?offset=0&page_size=100', fetcher);
+  const { data, error, isLoading } = useSWR<{data: Poll[]}, Error>('/api/polls?offset=0&page_size=1000', fetcher);
   
   return (
     <>
@@ -71,12 +71,12 @@ export const getServerSideProps: GetServerSideProps<Pick<PageDataWithIp, 'fallba
 
     try {
       // Getting prerendered data
-      const data = await fetcher(`${nextRequestMetaData._protocol}://${context.req.headers.host}/api/polls?offset=0&page_size=100`);
+      const data = await fetcher(`${nextRequestMetaData._protocol}://${context.req.headers.host}/api/polls?offset=0&page_size=1000`);
 
       return {
         props: {
           fallback: {
-            '/api/polls?offset=0&page_size=100': data
+            '/api/polls?offset=0&page_size=1000': data
           }
         }
       };
@@ -85,7 +85,7 @@ export const getServerSideProps: GetServerSideProps<Pick<PageDataWithIp, 'fallba
       return {
         props: {
           fallback: {
-            '/api/polls?offset=0&page_size=100': null
+            '/api/polls?offset=0&page_size=1000': null
           }
         }
       };
@@ -95,7 +95,7 @@ export const getServerSideProps: GetServerSideProps<Pick<PageDataWithIp, 'fallba
   return {
     props: {
       fallback: {
-        '/api/polls?offset=0&page_size=100': null
+        '/api/polls?offset=0&page_size=1000': null
       }
     }
   };

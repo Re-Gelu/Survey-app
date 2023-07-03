@@ -26,24 +26,25 @@ Expectations:
 ## :wrench: Project Launch Guide
 
 1) Create FaunaDB account and empty database
-2) Exec this FQL queries in FaunaDB FQL Shell or run `dbFactory` method in `src/faunadbConfig.ts`
-  - ```
-    CreateCollection({ name: "pollsCollectionName" });
-    ```
-  - ```
-    CreateIndex({
-      name: "pollsVotesByPollIpIndexName",
-      source: Collection("pollsCollectionName"),
-      terms: [
-        { field: ["ref", "id"] },
-        { field: ["data", "choices", "votes", "voter_ip"] },
-      ],
-    })
-    ```
-3) Create server database key on FaunaDB Security page
-4) Set this key in enviroment variables (for example in .env file)
-5) Run `npm run build` and after that `npm run start`
-6) Enjoy :)
+2) Create server database key on FaunaDB Security page
+3) Set this key in enviroment variables (for example in .env or next.config.js file)
+4) Run `npm run build` and after that `npm run start` (Database collections and indexes will be created automatically on app laucnch if they dont exists)
+5) Enjoy :)
+   
+> If Database collections and indexes didn't created exec this FQL queries in FaunaDB FQL Shell or run `dbFactory` method in `src/faunadbConfig.ts`
+>   ```
+>   CreateCollection({ name: "pollsCollectionName" });
+>   ```
+>   ```
+>   CreateIndex({
+>     name: "pollsVotesByPollIpIndexName",
+>     source: Collection("pollsCollectionName"),
+>     terms: [
+>       { field: ["ref", "id"] },
+>       { field: ["data", "choices", "votes", "voter_ip"] },
+>     ],
+>   })
+>   ```
 
 ## Features
 

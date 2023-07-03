@@ -56,7 +56,7 @@ Expectations:
 
 > For such projects, conventional SSR rendering is poorly suited, so serverside and clientside SWR hooks were used to pre-render data for better SEO and then conveniently real-time update them.
 
-> As a minus, I can highlight the absence of any authorization. But I tried to compensate for this by using IP as a unique user ID. The user has a dashboard in which the votes created from his IP are shown and only he can delete them.
+> As a minus, I can highlight the absence of any authorization (If you think about it... then it wasn't specified in the requirements of the project and everything is fine...). But I tried to compensate for this by using IP as a unique user ID. The user has a dashboard in which the votes created from his IP are shown and only he can delete them.
 
 > It was decided not to divide the database and many aspects in the code into modules. Since many parts of the code are unique (for example, FQL queries) and cannot be reused, and using a database in such a small project is easier without creating multiple collections.
 

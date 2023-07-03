@@ -106,6 +106,10 @@ Expectations:
 
 > User cannot vote, he can check other users answers
 
+![image](https://github.com/Re-Gelu/Survey-app/assets/75813517/87ef7617-dab3-40e9-ae70-41687634c714)
+> Image 6 -Poll deletion. You can delete poll only if you are creator (checked by IP).
+
+
 ## NPM scripts
 
 ### Build and dev scripts

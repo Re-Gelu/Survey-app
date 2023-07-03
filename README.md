@@ -27,7 +27,7 @@ Expectations:
 
 1) Create FaunaDB account and empty database
 2) Create server database key on FaunaDB Security page
-3) Set this key in enviroment variables (for example in .env or next.config.js file)
+3) Set this key in enviroment variables (for example in .env or next.config.js file) with name FAUNADB_SECRET_KEY
 4) Run `npm run build` and after that `npm run start` (Database collections and indexes will be created automatically on app laucnch if they dont exists)
 5) Enjoy :)
    
@@ -48,13 +48,61 @@ Expectations:
 
 ## Features
 
-- Server side rendering setup for Mantine
 - Color scheme is stored in cookie to avoid color scheme mismatch after hydration
-- Storybook with color scheme toggle
-- Jest with react testing library
-- ESLint setup with [eslint-config-mantine](https://github.com/mantinedev/eslint-config-mantine)
+- IP checking by middleware and getServerSideProps
+- When creating their own survey, users can choose whether there is a multiple choice in it. If so, then users can vote for several answer options.
+- They can also choose the expiration date of the survey. If you don't choose anything, the polls will be endless.
+- On poll page users have share button. If it clicked unique generated URL copied.
 
-## npm scripts
+> It was decided not to divide the database and many aspects in the code into modules. Since many parts of the code are unique (for example, FQL queries) and cannot be reused, and using a database in such a small project is easier without creating multiple collections.
+
+## :sleeping: REST API
+
+- [ GET, POST ] - api/polls
+   
+     GET - Can accept query vars `offset` and `page_size` for pagination. Return `offset, page_size, data`.
+     
+     POST - Accept `question, choices, is_multiple_answer_options, expires_at` vars. Return data of created poll.
+
+- [ GET, PUT, DELETE ] - api/polls/[id]
+   
+     GET - Return poll data by `id`.
+     
+     PUT - Accept `question, choices, is_multiple_answer_options, expires_at` vars. Return updated poll data.
+     
+     DELETE - Delete poll data by `id`.
+
+- [ POST ] - api/polls/[id]/vote
+
+     POST - Accept `choices` array of strings (Can be length of 1). Check IP, expiration date and return new poll data.
+
+## :memo: Description
+
+![image](https://github.com/Re-Gelu/Survey-app/assets/75813517/17ffab52-aaa1-42e0-838a-b24b97ecf5ed)
+> Image 1 - Home page
+
+![image](https://github.com/Re-Gelu/Survey-app/assets/75813517/9315ddab-a096-4d45-95cb-5b54c1898f39)
+> Image 2 - Dashboard page
+
+> All func based on IPs. Polls have creator_ip field and votes have voter_ip field.
+
+![image](https://github.com/Re-Gelu/Survey-app/assets/75813517/a6fa0771-388f-4f84-af8b-88cdad51f9df)
+> Image 2 - Poll page
+
+![image](https://github.com/Re-Gelu/Survey-app/assets/75813517/85b568a7-83f5-4ff0-ac78-213e6d6cd80c)
+> Image 3 -Poll page after user voted
+
+> User cannot vote again, he can only check other users answers
+
+![image](https://github.com/Re-Gelu/Survey-app/assets/75813517/02ebdd27-2f5a-4f70-bac5-a2ff629f2d7c)
+> Image 4 - Poll page after user voted with multiple option vote func and poll expiration
+
+![image](https://github.com/Re-Gelu/Survey-app/assets/75813517/f877d249-7cb9-4bf3-b11a-6bec1fec95f2)
+> Image 5 -Poll page after poll expiration
+
+> User cannot vote, he can check other users answers
+
+## NPM scripts
 
 ### Build and dev scripts
 

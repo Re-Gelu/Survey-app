@@ -1,4 +1,4 @@
-# :poop:  Survey app
+# :poop: Polling & Survey application
 
 ## :grey_question: Task for project
 Tools: Next.js, TypeScript, FaunaDB, Mantine UI

@@ -56,6 +56,8 @@ Expectations:
 
 > It was decided not to divide the database and many aspects in the code into modules. Since many parts of the code are unique (for example, FQL queries) and cannot be reused, and using a database in such a small project is easier without creating multiple collections.
 
+> For such projects, conventional SSR rendering is poorly suited, so serverside and clientside SWR hooks were used to pre-render data and then conveniently update them.
+
 ## :sleeping: REST API
 
 - [ GET, POST ] - api/polls

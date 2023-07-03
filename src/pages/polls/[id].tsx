@@ -323,6 +323,7 @@ export const getServerSideProps: GetServerSideProps<PageDataWithIp> = async (con
       }
     };
   } catch (err) {
+    console.warn(err);
     return {
       props: {
         ip: userIp

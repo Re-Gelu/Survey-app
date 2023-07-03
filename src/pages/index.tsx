@@ -70,7 +70,8 @@ export const getServerSideProps: GetServerSideProps<Pick<PageDataWithIp, 'fallba
         }
       }
     };
-  } catch {
+  } catch (err) {
+    console.warn(err);
     return {
       props: {}
     };

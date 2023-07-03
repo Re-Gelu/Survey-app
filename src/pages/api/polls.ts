@@ -61,6 +61,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(400).json({ "error": "Choices length must be 1 < N <= 10" }); 
         break;
       };
+      // Check if the choices are not equal
       if (choices.some((choice, index) =>
         choices.slice(index + 1).some(otherChoice =>
           choice.text.trim().toLowerCase() === otherChoice.text.trim().toLowerCase()

@@ -1,5 +1,5 @@
 import { Text, Center, Loader, Title, Container, 
-  Table, Button, ScrollArea, Group, Modal, ActionIcon, Grid } from '@mantine/core';
+  Table, Button, ScrollArea, Modal, ActionIcon, Grid } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconArrowBadgeRight, IconTrash, IconCheck, IconSkull } from '@tabler/icons-react';
 import { CustomAlert } from '@/components/Alert/Alert';
@@ -14,6 +14,7 @@ export const DashboardPollsTable = (props: PageDataWithIp) => {
   const { classes, cx } = useStyles();
   const { data, error, isLoading  } = useSWR<{data: Poll[]}, Error>(`/api/polls?offset=0&page_size=100`, fetcher);
   const [transitionOpened, setTransitionOpened] = useState<boolean>(false);
+  
   const filteredPolls: Poll[] | null = ((!error && !isLoading && data) ? 
       data.data.filter((poll: Poll )=> poll.creator_ip === props.ip) 
     : 
@@ -34,7 +35,7 @@ export const DashboardPollsTable = (props: PageDataWithIp) => {
         icon: <IconCheck />
       });
     })
-    .catch((error) => {
+    .catch(() => {
       notifications.show({ 
         message: 'Something went wrong... :(', 
         color: 'red',

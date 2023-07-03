@@ -38,11 +38,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           res.status(400).json({ "message": "Missing required data" }); 
           break;
         }
-        if (question && !(question.length >= 1 && question.length <= 250)) {
-          res.status(400).json({ "question": "Question length must be 1 <= N <= 250" }); 
+        if (question && !(question.length >= 1 && question.length <= 200)) {
+          res.status(400).json({ "question": "Question length must be 1 <= N <= 200" }); 
           break;
         }
-        if (choices && !(choices.length > 1 && choices.length <= 10)) {
+        if (choices && !(choices.length >= 1 && choices.length <= 10)) {
           res.status(400).json({ "choices": "Choices length must be 1 < N <= 10" }); 
           break;
         }
@@ -96,7 +96,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         )
       )
       .catch((err) => console.log(err))
-      res.status(200).json({ message: 'Опрос успешно удален' });
+      res.status(200).json({ message: 'The survey has been deleted successfully' });
       break;
 
     default:

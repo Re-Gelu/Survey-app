@@ -20,7 +20,7 @@ export const pollsCollectionName: string = 'Polls';
 export const pollsVotesByPollIpIndexName: string = 'votes_by_poll_and_ip';
 
 
-// On first run, make sure that all collections and indexes exists
+// On run, make sure that all collections and indexes exists
 export const dbFactory = async () => {
   await faunaClient.query(
     q.If(

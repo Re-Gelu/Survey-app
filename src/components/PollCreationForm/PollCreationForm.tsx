@@ -18,10 +18,12 @@ export const PollCreationForm = () => {
       question: hasLength({min: 1, max: 200}),
       choices: {
         text: (value, values) => {
+          // Validate if texts length >= 1 and <= 100
           if (!(value.length >= 1 && value.length <= 100)) {
             return true;
           };
 
+          // Validate if even two texts are not equal
           return values.choices.some((choice, index) =>
             values.choices.slice(index + 1).some(otherChoice =>
               choice.text.trim().toLowerCase() === otherChoice.text.trim().toLowerCase()

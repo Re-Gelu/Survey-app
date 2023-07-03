@@ -1,12 +1,10 @@
-import { Title, Text, Header, Container, Group, Burger, ActionIcon } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
+import { Title, Text, Header, Container, Group, ActionIcon } from '@mantine/core';
 import { ColorSchemeToggle } from '@/components/ColorSchemeToggle/ColorSchemeToggle';
 import { IconUser } from '@tabler/icons-react';
 import Link from 'next/link';
 import useStyles from './Header.styles';
 
 export const CustomHeader = () => {
-  const [opened, { toggle }] = useDisclosure(false);
   const { classes, cx } = useStyles();
 
   return (
@@ -32,7 +30,6 @@ export const CustomHeader = () => {
           </Link>
           <ColorSchemeToggle></ColorSchemeToggle>
         </Group>
-
       </Container>
     </Header>
   );

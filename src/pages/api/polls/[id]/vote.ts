@@ -38,12 +38,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     );
     const pollData = existingPoll.data as Poll;
     const existingChoices = pollData.choices;
-
-    const validChoices = choices.every(choice =>
+    
+    if (!(choices.every(choice =>
       existingChoices.some((c: any) => c.text === choice)
-    );
-
-    if (!validChoices) {
+    ))) {
       res.status(400).json({ "error": "Invalid choices" });
       return;
     };

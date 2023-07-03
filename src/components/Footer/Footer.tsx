@@ -4,13 +4,13 @@ import { IconCircle } from '@tabler/icons';
 export const CustomFooter = () => {
   return (
     <Footer height={60} p="md" mt="xl" withBorder={false}>
-          <Divider 
-            my="xl" 
-            label={
-              <IconCircle color="gray" stroke={1} size={28}/>
-            }
-            labelPosition="center" 
-          />
+        <Divider 
+          my="xl" 
+          label={
+            <IconCircle color="gray" stroke={1} size={28}/>
+          }
+          labelPosition="center" 
+        />
         <Grid justify="center">
           <Grid.Col span="auto"></Grid.Col>
           <Grid.Col span={6}>

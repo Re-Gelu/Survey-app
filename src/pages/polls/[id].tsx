@@ -23,47 +23,6 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
   const [ isPollExpired, setIsPollExpired ] = useState<boolean>(false);
   const [ votedOption, setVoteOption ] = useState<string []>([]);
   const [ isAnimate, setIsAnimate ] = useState<boolean>(false);
-
-  // Getting all main states
-  // Getting amount of votes, picked vote option, is already voted value and is poll expired
-  useEffect(() => {
-    if (!error && !isLoading && data) {
-      votesAmountHandlers.set(data.choices.reduce((sum: number, choice: Choice) => sum + choice.votes.length, 0));      
-      setIsAlreadyVoted(data.choices.some((choice: Choice) => choice.votes.some((vote: Vote) => vote.voter_ip === props.ip)));
-      if (data.expires_at && (new Date(data.expires_at).getTime() <= new Date().getTime())) {
-        setIsPollExpired(true);
-      };
-    };
-  }, [data, error, isLoading]);
-
-  // Setting vote options if already voted or vote expired
-  useEffect(() => {
-    if (!error && !isLoading && data) {
-      const votedChoice: string[] = data.choices.filter((choice: Choice) =>
-        choice.votes.some((vote: Vote) => vote.voter_ip === props.ip)
-      )
-      .map((choice: Choice) => choice.text);
-      if (isAlreadyVoted || isPollExpired && votedChoice) {
-        setVoteOption(votedChoice);
-      };
-    };
-  }, [data, error, isLoading, isAlreadyVoted, isPollExpired]);
-
-  // Show votes progressbars if all ok
-  useEffect(() => {
-    if (isAlreadyVoted || isPollExpired) {
-      setIsAnimate(true);
-    };
-  }, [isAlreadyVoted, isPollExpired]);
-
-  // If voted - set value to form
-  useEffect(() => {
-    form.setFieldValue(
-      'choices', (votedOption.length == 1) ? votedOption[0] : votedOption
-    );
-  }, [votedOption]);
-  
-  
   const form = useForm({
     initialValues: {
       choices: votedOption as string | string[],
@@ -139,6 +98,45 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
     });
   };
 
+  // Getting all main states
+  // Getting amount of votes, picked vote option, is already voted value and is poll expired
+  useEffect(() => {
+    if (!error && !isLoading && data) {
+      votesAmountHandlers.set(data.choices.reduce((sum: number, choice: Choice) => sum + choice.votes.length, 0));      
+      setIsAlreadyVoted(data.choices.some((choice: Choice) => choice.votes.some((vote: Vote) => vote.voter_ip === props.ip)));
+      if (data.expires_at && (new Date(data.expires_at).getTime() <= new Date().getTime())) {
+        setIsPollExpired(true);
+      };
+    };
+  }, [data, error, isLoading]);
+
+  // Setting vote options if already voted or vote expired
+  useEffect(() => {
+    if (!error && !isLoading && data) {
+      const votedChoice: string[] = data.choices.filter((choice: Choice) =>
+        choice.votes.some((vote: Vote) => vote.voter_ip === props.ip)
+      )
+      .map((choice: Choice) => choice.text);
+      if (isAlreadyVoted || (isPollExpired && votedChoice)) {
+        setVoteOption(votedChoice);
+      };
+    };
+  }, [data, error, isLoading, isAlreadyVoted, isPollExpired]);
+
+  // Show votes results and progressbars if all ok
+  useEffect(() => {
+    if (isAlreadyVoted || isPollExpired) {
+      setIsAnimate(true);
+    };
+  }, [isAlreadyVoted, isPollExpired]);
+
+  // If voted - set value to form
+  useEffect(() => {
+    form.setFieldValue(
+      'choices', (votedOption.length == 1) ? votedOption[0] : votedOption
+    );
+  }, [votedOption]);
+
   // Create buttons to vote
   const voting_options = ((!error && !isLoading && data) ? 
       (data.is_multiple_answer_options) ?
@@ -182,23 +180,25 @@ const PollPage = (props: InferGetServerSidePropsType<typeof getServerSideProps>)
   // Create buttons and progress bars to show results
   const voting_results = ((!error && !isLoading && data) ? 
       (isAlreadyVoted || isPollExpired) ?
+        
         (data.is_multiple_answer_options) ?
           // If already voted or poll expired
           // If multiple answer options
-            data.choices.map((item: Choice) => (
-              <Group key={item.text} grow mt="lg">
-                <Checkbox  
-                  label={item.text} 
-                  size="md"
-                  disabled={!(item.text === votedOption[0])}
-                  checked={item.text === votedOption[0]}
-                >
-                </Checkbox>
-                <Transition mounted={isAnimate} keepMounted transition="fade" duration={500}>
-                  {(styles) => <Progress style={styles} label={`${item.votes.length}`} size="xl" value={(item.votes.length / votesAmount) * 100} />}
-                </Transition>
-              </Group>
-            ))
+          data.choices.map((item: Choice) => (
+            <Group key={item.text} grow mt="lg">
+              <Checkbox
+                label={item.text}
+                value={item.text}
+                size="md"
+                disabled={!(votedOption.includes(item.text))}
+                checked={votedOption.includes(item.text)}
+              >
+              </Checkbox>
+              <Transition mounted={isAnimate} keepMounted transition="fade" duration={500}>
+                {(styles) => <Progress style={styles} label={`${item.votes.length}`} size="xl" value={(item.votes.length / votesAmount) * 100} />}
+              </Transition>
+            </Group>
+          ))
         : 
           // If not already voted or poll expired
           // If not multiple answer options

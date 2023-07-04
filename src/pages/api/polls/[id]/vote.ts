@@ -40,7 +40,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const existingChoices = pollData.choices;
 
     if (!(choices.every(choice =>
-      existingChoices.some((c: any) => c.text === choice)
+      existingChoices.some((c: Choice) => c.text === choice)
     ))) {
       res.status(400).json({ "error": "Invalid choices" });
       return;
@@ -74,7 +74,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const updatedPoll: FaunaPollResponse = await faunaClient.query(
       q.Update(q.Ref(q.Collection(pollsCollectionName), id), {
         data: {
-          choices: existingChoices.map((c: any) => {
+          choices: existingChoices.map((c: Choice) => {
             if (choices.includes(c.text)) {
               return {
                 ...c,

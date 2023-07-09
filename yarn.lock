@@ -6123,6 +6123,11 @@ fastq@^1.6.0:
   dependencies:
     reusify "^1.0.4"
 
+fauna@^0.9.1:
+  version "0.9.1"
+  resolved "https://registry.npmjs.org/fauna/-/fauna-0.9.1.tgz"
+  integrity sha512-NajDX8YjzvFz5ok4STQiT7+d/M7Xc7cByh9z91h9SERoUAGrq0dlhRLGq9+mPbs5KYrwo/P82N24bBg6hI/2aA==
+
 faunadb@^4.8.0:
   version "4.8.0"
   resolved "https://registry.npmjs.org/faunadb/-/faunadb-4.8.0.tgz"

@@ -1,8 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next';
-import faunaClient, { q, defaultPageOffset, pollsCollectionName } from '@/faunadbConfig';
+import faunaClient, { fql, defaultPageSize, pollsCollectionName } from '@/faunadbConfig';
 import { getCookie } from 'cookies-next';
 import requestIp from 'request-ip';
+import { QueryValue } from 'fauna';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const reqIp = requestIp.getClientIp(req);
@@ -11,36 +12,22 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const {
     body,
     method,
-    query: { offset, page_size }
+    query: { after, page_size }
   } = req;
 
   switch(method) {
     case 'GET':
 
-      // Getting proper page size and offset
-      const requestPageSize: number = page_size ? parseInt(page_size as string) : defaultPageOffset
-      const requestOffset: number = offset ? parseInt(offset as string) : 0
+      // Getting proper page size and after
+      const requestPageSize: number = page_size ? parseInt(page_size as string) : defaultPageSize;
+      const requestAfter: string = after ? after as string : "";
 
       // DB Get request
-      var dbQueryResponse: FaunaPollsQueryResponse = await faunaClient.query(
-        q.Map(
-          q.Paginate(q.Documents(q.Collection('Polls'))),
-          q.Lambda('ref', q.Get(q.Var('ref')))
-        )
+      var dbQueryResponsee = await faunaClient.query(
+        fql`Polls.all().reverse().paginate(${requestAfter ? requestAfter : requestPageSize})`
       );
-      
-      // Mapping DB response to add id
-      const polls: Partial<Poll>[] = dbQueryResponse.data.map((poll: FaunaPollResponse) => ({
-        id: poll.ref.id,
-        ...poll.data,
-      }));
-      
-      // Response with pagination slice
-      res.status(200).json({
-        offset: requestOffset,
-        page_size: requestPageSize,
-        data: polls.slice(requestOffset, requestOffset + requestPageSize).reverse()
-      });
+
+      res.status(200).json(dbQueryResponsee);
       break;
 
     case 'POST':
@@ -75,7 +62,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       const is_multiple_answer_options_final: boolean = (typeof(is_multiple_answer_options) === "undefined") ? false : is_multiple_answer_options;
 
-      const data: Poll = {
+      const dbQueryData: Poll = {
         question: question,
         choices: choices,
         is_multiple_answer_options: is_multiple_answer_options_final,
@@ -85,14 +72,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       };
 
       // DB Create request
-      var dbQueryResponse: FaunaPollsQueryResponse = await faunaClient.query(
-        q.Create(q.Collection(pollsCollectionName), {
-          data: data,
-        })
+      var dbQueryResponse = await faunaClient.query(
+        fql`Polls.create(${dbQueryData as QueryValue})`
       );
 
-
-      res.status(200).json({ data: dbQueryResponse.data });
+      res.status(200).json(dbQueryResponse);
       break;
 
     default:

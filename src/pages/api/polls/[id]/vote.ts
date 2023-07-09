@@ -1,7 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import faunaClient, { q, pollsCollectionName, pollsVotesByPollIpIndexName } from '@/faunadbConfig';
+import faunaClient, { fql } from '@/faunadbConfig';
 import { getCookie } from 'cookies-next';
 import requestIp from 'request-ip';
+import { QueryValue } from 'fauna';
 
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -33,8 +34,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     };
 
     // Check if any choice is missing or invalid
-    const existingPoll: FaunaPollResponse = await faunaClient.query(
-      q.Get(q.Ref(q.Collection(pollsCollectionName), id))
+    var existingPoll = await faunaClient.query(
+      fql`Polls.byId(${id as string})`
     );
     const pollData = existingPoll.data as Poll;
     const existingChoices = pollData.choices;
@@ -53,13 +54,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     };
 
     // Check if user already voted
-    if (await faunaClient.query(q.Exists(
-      q.Match(
-        q.Index(pollsVotesByPollIpIndexName),
-        id as string,
-        userIp as string
-      )
-    ))) {
+    if ((await faunaClient.query(
+      fql`Polls.byId(${id as string})?.choices.any(choice => choice.votes.any(vote => vote.voter_ip == ${userIp}))`
+    )).data) {
       res.status(400).json({ "error": "Already voted!" });
       return;
     };
@@ -70,29 +67,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       created_at: new Date().toJSON(),
     };
 
-    // DB Update request
-    const updatedPoll: FaunaPollResponse = await faunaClient.query(
-      q.Update(q.Ref(q.Collection(pollsCollectionName), id), {
-        data: {
-          choices: existingChoices.map((c: Choice) => {
-            if (choices.includes(c.text)) {
-              return {
-                ...c,
-                votes: [...c.votes, vote],
-              };
-            }
-            return c;
-          })
-        },
+    const dbQueryData = {
+      choices: existingChoices.map((c: Choice) => {
+        if (choices.includes(c.text)) {
+          return {
+            ...c,
+            votes: [...c.votes, vote],
+          };
+        }
+        return c;
       })
-    );
-
-    const poll = {
-      id: updatedPoll.ref.id,
-      ...updatedPoll.data,
     };
 
-    res.status(200).json(poll);
+    // DB Update request
+    const updatedPoll = await faunaClient.query(
+      fql`Polls.byId(${id as string})!.update(${dbQueryData as QueryValue})`
+    );
+
+    res.status(200).json(updatedPoll);
   } catch (error) {
     res.status(500).json({ message: 'Internal Server Error' });
   }

@@ -2,14 +2,13 @@ import { PollsTable } from '@/components/PollsTable/PollsTable';
 import { CustomAlert } from '@/components/Alert/Alert';
 import { SurveyStepper } from '@/components/SurveyStepper/SurveyStepper';
 import { Grid, Text, Center, Loader, Space, Title, Paper, Container, Blockquote } from '@mantine/core';
-import type { InferGetServerSidePropsType, GetServerSideProps, NextApiRequest } from 'next';
+import type { InferGetServerSidePropsType, GetServerSideProps } from 'next';
 import useSWR, { SWRConfig } from 'swr';
 import fetcher from '@/swr';
-import { useRouter } from 'next/router';
 
 const IndexPage = () => {
   const { data, error, isLoading } = useSWR<{data: Poll[]}, Error>('/api/polls?offset=0&page_size=1000', fetcher);
-  
+
   return (
     <>
       <Grid my="xl">

@@ -32,7 +32,7 @@ type FaunaPollResponse = {
 
 // Type of Fauna DB query response
 type FaunaPollsQueryResponse = {
-  data: FaunaPollResponse[]
+  data: FaunaPollResponse[];
 };
 
 type PageDataWithIp = {

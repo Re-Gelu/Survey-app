@@ -5,7 +5,7 @@ const Custom500 = () => {
     <Container my="xl" py="xl">
       <Paper shadow="sm" radius="md" p="xl" withBorder>
         <Center my="xl" py="xl">
-          <Stack align="center">
+          <Stack align="center"> 
             <Title order={2} fw={200}>
               A server error has occurred...
             </Title>
@@ -16,7 +16,7 @@ const Custom500 = () => {
         </Center>
       </Paper>
     </Container>
-  );
+  )
 };
 
 export default Custom500;

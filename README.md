@@ -46,7 +46,7 @@ Expectations:
 >   })
 >   ```
 
-## Features and thoughts (You must read it! (At least thoughts...))
+<!-- ## Features and thoughts (You must read it! (At least thoughts...))
 
 - Color scheme is stored in cookie to avoid color scheme mismatch after hydration
 - IP checking by middleware and getServerSideProps
@@ -58,7 +58,7 @@ Expectations:
 
 > As a minus, I can highlight the absence of any authorization (If you think about it... then it wasn't specified in the requirements of the project and everything is fine...). But I tried to compensate for this by using IP as a unique user ID. The user has a dashboard in which the votes created from his IP are shown and only he can delete them.
 
-> It was decided not to divide the database and many aspects in the code into modules. Since many parts of the code are unique (for example, FQL queries) and cannot be reused, and using a database in such a small project is easier without creating multiple collections.
+> It was decided not to divide the database and many aspects in the code into modules. Since many parts of the code are unique (for example, FQL queries) and cannot be reused, and using a database in such a small project is easier without creating multiple collections. -->
 
 ## :sleeping: REST API
 
